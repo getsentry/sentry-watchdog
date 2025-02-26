@@ -1,4 +1,4 @@
-import { CollectorOptions, collect } from './src';
+import { CollectorOptions, collect, aggregateReports } from './src';
 import { join } from 'path';
 import axios from 'axios';
 import * as xml2js from 'xml2js';
@@ -164,6 +164,8 @@ async function main() {
     while (running > 0) {
         await new Promise(resolve => setTimeout(resolve, 1000));
     }
+
+    await aggregateReports();
 }
 
 main();

@@ -89,3 +89,5 @@ build
 # Scan results
 scan_results
 scan_reports
+# do not store the cookie results in the repo
+cookies.json
