@@ -198,8 +198,8 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
                 });
                 
                 // Wait for network to be idle and additional time for dynamic content
-                await page.waitForNavigation({ waitUntil: waitUntil, timeout: 10000 }).catch(() => {});
-                await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds for dynamic content
+                await page.waitForNavigation({ waitUntil: waitUntil, timeout: 1000 }).catch(() => {});
+                await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 5 seconds for dynamic content
                 
             } catch (error) {
                 console.log('First attempt failed, trying with domcontentloaded');
@@ -207,7 +207,6 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
                     timeout: timeout,
                     waitUntil: 'domcontentloaded' as PuppeteerLifeCycleEvent
                 });
-                
                 // Same waiting pattern for retry
                 await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 10000 }).catch(() => {});
                 await new Promise(resolve => setTimeout(resolve, 5000));
