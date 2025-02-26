@@ -1,0 +1,50 @@
+{
+  "__cf_bm/.vimeo.com": [
+    "https://sentry.io/for/code-coverage/",
+    "https://blog.sentry.io/building-better-mobile-experiences-tips-from-riot-games-and-nextdoor/",
+    "https://blog.sentry.io/exception-perceptions-smartcar/",
+    "https://blog.sentry.io/exception-perceptions-github-probot/",
+    "https://blog.sentry.io/sentry-azure-devops-integration-update/",
+    "https://blog.sentry.io/sentry-github-integration-update/",
+    "https://blog.sentry.io/atlassian-jira-bitbucket-update/",
+    "https://blog.sentry.io/sentry-exception-perceptions-csharp-xamarin/",
+    "https://blog.sentry.io/relevance-and-ownership-of-issues/",
+    "https://help.sentry.io/product-features/configuration/video-tutorial-issue-alert-rules/"
+  ],
+  "_cfuvid/.vimeo.com": [
+    "https://sentry.io/for/cron-monitoring/",
+    "https://sentry.io/for/error-monitoring/",
+    "https://blog.sentry.io/building-better-mobile-experiences-tips-from-riot-games-and-nextdoor/",
+    "https://blog.sentry.io/exception-perceptions-smartcar/",
+    "https://blog.sentry.io/exception-perceptions-github-probot/",
+    "https://blog.sentry.io/sentry-azure-devops-integration-update/",
+    "https://blog.sentry.io/sentry-github-integration-update/",
+    "https://blog.sentry.io/atlassian-jira-bitbucket-update/",
+    "https://blog.sentry.io/sentry-exception-perceptions-csharp-xamarin/",
+    "https://blog.sentry.io/relevance-and-ownership-of-issues/",
+    "https://help.sentry.io/product-features/configuration/video-tutorial-issue-alert-rules/"
+  ],
+  "cf_clearance/.vimeo.com": [
+    "https://sentry.io/for/cron-monitoring/",
+    "https://sentry.io/for/error-monitoring/",
+    "https://blog.sentry.io/building-better-mobile-experiences-tips-from-riot-games-and-nextdoor/",
+    "https://blog.sentry.io/exception-perceptions-smartcar/",
+    "https://blog.sentry.io/exception-perceptions-github-probot/",
+    "https://blog.sentry.io/sentry-azure-devops-integration-update/",
+    "https://blog.sentry.io/sentry-github-integration-update/",
+    "https://blog.sentry.io/atlassian-jira-bitbucket-update/",
+    "https://blog.sentry.io/sentry-exception-perceptions-csharp-xamarin/",
+    "https://blog.sentry.io/relevance-and-ownership-of-issues/",
+    "https://help.sentry.io/product-features/configuration/video-tutorial-issue-alert-rules/"
+  ],
+  "sentry-sc/.sentry.io": ["https://sentry.io/auth/login/"],
+  "session/.sentry.io": ["https://sentry.io/auth/login/"],
+  "m/m.stripe.com": ["https://sentry.io/auth/login/"],
+  "__stripe_mid/.sentry.io": ["https://sentry.io/auth/login/"],
+  "__stripe_sid/.sentry.io": ["https://sentry.io/auth/login/"],
+  "_GRECAPTCHA/www.recaptcha.net": ["https://status.sentry.io"],
+  "messages/.sentry.io": [
+    "https://sentry.io/auth/login/",
+    "https://sentry.io/extensions/github/setup/"
+  ]
+}
