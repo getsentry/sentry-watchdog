@@ -226,11 +226,11 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
         };
 
         // Go to the first url
-        console.log('Going to the first url', inUrl);
+        // console.log('Going to the first url', inUrl);
         await navigateWithTimeout(page, inUrl, args.defaultTimeout, args.defaultWaitUntil as PuppeteerLifeCycleEvent);
 
         pageIndex++;
-        console.log('Saving first page response');
+        // console.log('Saving first page response');
 
         let duplicatedLinks = [];
         const outputLinks = {
@@ -276,7 +276,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
         }
         const browse_links = sampleSize(subDomainLinks, args.numPages);
         output.browsing_history = [output.uri_dest].concat(browse_links.map(l => l.href));
-        console.log('About to browse more links');
+        // console.log('About to browse more links');
 
         // try {
         for (const link of output.browsing_history.slice(1)) {
@@ -290,7 +290,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
             if (args.clearCache) {
                 await clearCookiesCache(page);
             }
-            console.log(`Browsing now to ${link}`);
+            // console.log(`Browsing now to ${link}`);
             
             await navigateWithTimeout(page, link, args.defaultTimeout, args.defaultWaitUntil as PuppeteerLifeCycleEvent);
 

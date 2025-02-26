@@ -29,7 +29,7 @@ const deleteFolderRecursive = path => {
 // where the browser.close method hangs indefinitely
 // See https://github.com/Sparticuz/chromium/issues/85#issuecomment-1527692751
 export const closeBrowser = async browser => {
-    console.log('closing browser');
+    // console.log('closing browser');
     const pages = await browser.pages();
     for (let i = 0; i < pages.length; i++) {
         await pages[i].close();

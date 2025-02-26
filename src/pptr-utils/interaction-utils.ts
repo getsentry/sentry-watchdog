@@ -46,12 +46,12 @@ export const fillForms = async (page: Page, timeout = 6000) => {
     });
 
     const fillPromise = async () => {
-        console.log('Entering fillPromise.');
+        // console.log('Entering fillPromise.');
         try {
             if (!page.isClosed()) {
-                console.log('Checking for inputs on the page');
+                // console.log('Checking for inputs on the page');
                 const elements = await page.$$('input');
-                console.log(`Found ${elements.length} input elements`);
+                // console.log(`Found ${elements.length} input elements`);
                 let count = 0;
                 for (const el of elements) {
                     if (!page.isClosed()) {
@@ -96,12 +96,12 @@ export const fillForms = async (page: Page, timeout = 6000) => {
                         }
                         isInteracting = false;
                     } else {
-                        console.log('Page is closed. Exiting loop.');
+                        // console.log('Page is closed. Exiting loop.');
                         break;
                     }
                 }
             } else {
-                console.log('Page is closed. Exiting fillForms.');
+                // console.log('Page is closed. Exiting fillForms.');
             }
         } catch (error) {
             if (error.message.includes('Execution context was destroyed')) {
@@ -110,7 +110,7 @@ export const fillForms = async (page: Page, timeout = 6000) => {
                 console.error(`Error in fillForms: ${error.message}`);
             }
         } finally {
-            console.log('Done with fillForms');
+            // console.log('Done with fillForms');
         }
     };
 
