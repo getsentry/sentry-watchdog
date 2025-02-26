@@ -190,11 +190,12 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
 
         // Function to navigate to a page with a timeout guard
         const navigateWithTimeout = async (page: Page, url: string, timeout: number, waitUntil: PuppeteerLifeCycleEvent) => {
+            let timeoutId: NodeJS.Timeout;
             try {
                 page_response = await Promise.race([
                     page.goto(url, {
                         timeout: timeout,
-                        waitUntil: waitUntil
+                        waitUntil: 'domcontentloaded' as PuppeteerLifeCycleEvent
                     }),
                     new Promise((_, reject) =>
                         setTimeout(() => {
@@ -203,12 +204,23 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
                         }, 10000)
                     )
                 ]);
+                clearTimeout(timeoutId);
+                
+                // Wait for network to be idle and additional time for dynamic content
+                await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 10000 }).catch(() => {});
+                await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds for dynamic content
+                
             } catch (error) {
+                clearTimeout(timeoutId);
                 console.log('First attempt failed, trying with domcontentloaded');
                 page_response = await page.goto(url, {
                     timeout: timeout,
-                    waitUntil: 'domcontentloaded' as PuppeteerLifeCycleEvent
+                    waitUntil: waitUntil
                 });
+                
+                // Same waiting pattern for retry
+                await page.waitForNavigation({ waitUntil: 'networkidle0', timeout: 10000 }).catch(() => {});
+                await new Promise(resolve => setTimeout(resolve, 5000));
             }
             await savePageContent(pageIndex, args.outDir, page, args.saveScreenshots);
         };
