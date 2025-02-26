@@ -103,7 +103,7 @@ const reportEventListeners = (eventData: BlacklightEvent[]) => {
     const parsedEvents = [];
     eventData.forEach((event: JsInstrumentEvent) => {
         const data = event.data;
-        if (data.symbol.indexOf('addEventListener') > -1) {
+        if (data.symbol.indexOf('addEventListener') > -1 && data.value) {
             const values = loadJSONSafely(data.value);
             if (Array.isArray(values) && MONITORED_EVENTS.includes(values[0])) {
                 const eventGroup = Object.keys(BEHAVIOUR_TRACKING_EVENTS).filter(key => BEHAVIOUR_TRACKING_EVENTS[key].includes(values[0]));
