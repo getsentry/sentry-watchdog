@@ -48,19 +48,60 @@ async function getPagesFromFeed(feeds: string[]): Promise<string[]> {
     return pagesToScan;
 }
 
+interface ScannerConfig {
+    title: string;
+    scanner: {
+        headless: boolean;
+        numPages: number;
+        captureHar: boolean;
+        saveScreenshots: boolean;
+        emulateDevice: {
+            viewport: {
+                height: number;
+                width: number;
+            };
+            userAgent: string;
+        };
+    };
+    output: {
+        outDir: string;
+        reportDir: string;
+    };
+    target_list: string;
+    maxConcurrent: number;
+}
+
+interface TargetConfig {
+    sitemaps?: string[];
+    rss?: string[];
+    pages?: string[];
+}
+
+// Read scanner config
+const scannerConfig = yaml.load(
+    fs.readFileSync('./scanner_config.yaml', 'utf8')
+) as ScannerConfig;
+
+// Read target config
+const targetConfig = yaml.load(
+    fs.readFileSync(scannerConfig.target_list, 'utf8')
+) as TargetConfig;
+
+// Initialize with empty arrays if properties are missing
+const sitemaps: string[] = targetConfig.sitemaps || [];
+const rssFeed: string[] = targetConfig.rss || [];
+const individualPages: string[] = targetConfig.pages || [];
+
 async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): Promise<void> {
     const defaultConfig: CollectorOptions = {
-        title: 'Sentry Cookie Scanner',
-        headless: true,
-        numPages: 0,
-        captureHar: false,
-        saveScreenshots: false,
-        emulateDevice: {
-            viewport: {height: 1920, width: 1080},
-            userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"
-        },
-        outDir: join(__dirname, 'scan_results', url.replace(/^https?:\/\//, '').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+$/g, '')),
-        reportDir: join(__dirname, 'scan_reports'),
+        title: scannerConfig.title,
+        headless: scannerConfig.scanner.headless,
+        numPages: scannerConfig.scanner.numPages,
+        captureHar: scannerConfig.scanner.captureHar,
+        saveScreenshots: scannerConfig.scanner.saveScreenshots,
+        emulateDevice: scannerConfig.scanner.emulateDevice,
+        outDir: join(__dirname, scannerConfig.output.outDir, url.replace(/^https?:\/\//, '').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+$/g, '')),
+        reportDir: join(__dirname, scannerConfig.output.reportDir),
     };
 
     const config = { ...defaultConfig, ...customConfig };
@@ -77,22 +118,6 @@ async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): P
     }
 }
 
-interface TargetConfig {
-    sitemaps?: string[];
-    rss?: string[];
-    pages?: string[];
-}
-
-// Read and parse the YAML file
-const targetConfig = yaml.load(
-    fs.readFileSync('./target.yml', 'utf8')
-) as TargetConfig;
-
-// Initialize with empty arrays if properties are missing
-const sitemaps: string[] = targetConfig.sitemaps || [];
-const rssFeed: string[] = targetConfig.rss || [];
-const individualPages: string[] = targetConfig.pages || [];
-
 async function main() {
     let pagesToScan: string[] = await getPagesFromSite(sitemaps);
     pagesToScan = pagesToScan.concat(await getPagesFromFeed(rssFeed));
@@ -106,9 +131,38 @@ async function main() {
         }
         fs.mkdirSync(path);
     });
-    
-    for (const page of pagesToScan) {
-        scanUrl(page);
+
+    // Set the number of concurrent scans
+    const maxConcurrent = scannerConfig.maxConcurrent;
+    let running = 0;
+    const queue = [...pagesToScan];
+
+    async function processNext() {
+        while (queue.length > 0 && running < maxConcurrent) {
+            const page = queue.shift()!;
+            running++;
+            
+            // Use immediately invoked async function to handle each scan
+            (async () => {
+                try {
+                    await scanUrl(page);
+                } catch (error) {
+                    console.error(`Error scanning ${page}:`, error);
+                } finally {
+                    running--;
+                    // Try to process next item when this one is done
+                    processNext();
+                }
+            })();
+        }
+    }
+
+    // Start the processing
+    await processNext();
+
+    // Wait until all scans are complete
+    while (running > 0) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
     }
 }
 
