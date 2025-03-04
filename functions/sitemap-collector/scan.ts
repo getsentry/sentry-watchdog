@@ -63,6 +63,9 @@ interface ScannerConfig {
             userAgent: string;
         };
         extraChromiumArgs: string[];
+        extraPuppeteerOptions?: {
+            protocolTimeout?: number;
+        };
     };
     output: {
         outDir: string;
@@ -101,9 +104,11 @@ async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): P
         captureHar: scannerConfig.scanner.captureHar,
         saveScreenshots: scannerConfig.scanner.saveScreenshots,
         emulateDevice: scannerConfig.scanner.emulateDevice,
-        extraChromiumArgs: scannerConfig.scanner.extraChromiumArgs,
         outDir: join(__dirname, scannerConfig.output.outDir, url.replace(/^https?:\/\//, '').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+$/g, '')),
         reportDir: join(__dirname, scannerConfig.output.reportDir),
+        extraPuppeteerOptions: {
+            protocolTimeout: 60000  // Increase timeout to 60 seconds
+        }
     };
 
     const config = { ...defaultConfig, ...customConfig };
@@ -149,7 +154,8 @@ async function main() {
                 try {
                     await scanUrl(page);
                 } catch (error) {
-                    console.error(`Error scanning ${page}:`, error);
+                    // if failed, try again
+                    await scanUrl(page);
                 } finally {
                     running--;
                     // Try to process next item when this one is done

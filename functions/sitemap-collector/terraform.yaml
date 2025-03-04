@@ -1,0 +1,11 @@
+name: sitemap-collector
+description: collect all the pages in the sitemaps provided and save them to pub/sub
+cloud-function-gen2: 
+  timeout: 120
+  available_memory: 256M
+  
+cron:
+  schedule: 0 * * * *
+  time_zone: America/New_York
+  attempt_deadline: 320s
+  http_method: GET

@@ -1,0 +1,6 @@
+name: cookie-scanner
+description: cookie scanner based on the blacklight-collector
+cloud-function-gen2: 
+  timeout: 3600
+  available_memory: 8G 
+  runtime: nodejs20

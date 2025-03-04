@@ -1,0 +1,1 @@
+Example function for the gen2 cloud function

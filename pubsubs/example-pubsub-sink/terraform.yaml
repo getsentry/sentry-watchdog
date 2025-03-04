@@ -1,0 +1,10 @@
+name: example-pubsub-sink
+description: example pubsub sink
+pubsub:
+  topic_name: example-pubsub-sink-topic
+  subscription_id: example-pubsub-sink-subscription
+  service_account_id: example-pubsub-sink-sa
+  service_account_display_name: Example PubSub Sink Service Account
+sink:
+  sink_name: example-pubsub-sink
+  

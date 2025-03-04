@@ -1,0 +1,17 @@
+name: example-gen2-cron
+description: gen2 cloud function example
+cloud-function-gen2: 
+  timeout: 120
+  available_memory: 256M
+  environment_variables: 
+    ENV_1: $project_id # value will be pulled from terraform.tfvars
+    ENV_2: 345
+  secrets:
+    - key: test_key_1
+      secret: test_key_1
+      version: latest
+cron:
+  schedule: 0 * * * *
+  time_zone: America/New_York
+  attempt_deadline: 320s
+  http_method: GET

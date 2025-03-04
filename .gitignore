@@ -91,3 +91,20 @@ scan_results
 scan_reports
 # do not store the cookie results in the repo
 cookies.json
+
+# terraform plan files
+plan
+*.plan
+*tfplan
+
+# state files
+*.tfstate
+*.tfstate.backup
+.terraform/
+
+# state files
+*.tfstate
+*.tfstate.backup
+
+# best practice: version control your tf lock file
+!.terraform.lock.hcl
