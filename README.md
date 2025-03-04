@@ -1,14 +1,13 @@
-# Blacklight-Collector
+# Work in progress
 
-**NOTE: This repo contains some, but not all, of the code backing [Blacklight](https://themarkup.org/blacklight). It may not be very useful on its own. We're thinking about ways to move more of the functionality into this package in order to make it more generally useful.**
+# Sentry Cookie Scanner
+Sentry took a stand of removing all 3rd party cookeis and trackers from our public websites in 2024.
+- [We removed advertising cookies and here’s what happened - Matt Henderson](https://blog.sentry.io/we-removed-advertising-cookies-heres-what-happened/)
+- [Navigating Cookies at Sentry: A Legal Perspective - Loretta Lau](https://blog.sentry.io/navigating-cookies-at-sentry-a-legal-perspective/)
+- [Removing ad trackers and cookies - the technical perspective - Jeffrey Hung](https://blog.sentry.io/removing-ad-trackers-and-cookies-the-technical-perspective/)
+- [Sentry Cookie Bounty](https://sentry.io/cookiebounty/)
 
-For more information about the `blacklight-collector` please read our [methodology](https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector).
-
-`blacklight-collector` is available on npm. You can add it to your own project with the following command.
-
-```
-npm i @themarkup/blacklight-collector
-```
+This repository is a tool that we use to helps Sentry look for cookies on our public sites. It's forked and built on top of [blacklight-collector from the Markup](https://github.com/the-markup/blacklight-collector/tree/main?tab=readme-ov-file). For more information about the `blacklight-collector` please read our [methodology](https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector).
 
 If you are interested in running it locally you can clone this repository and follow the instructions below.
 
