@@ -48,7 +48,7 @@ const DEFAULT_OPTIONS = {
         'third_party_trackers'
     ],
     puppeteerExecutablePath: null as string | null,
-    extraChromiumArgs: [] as string[],
+    extraChromiumArgs: ['--disable-features=TrackingProtection3pcd'] as string[],
     extraPuppeteerOptions: {} as Partial<PuppeteerLaunchOptions>
 };
 
