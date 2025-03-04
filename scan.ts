@@ -62,6 +62,7 @@ interface ScannerConfig {
             };
             userAgent: string;
         };
+        extraChromiumArgs: string[];
     };
     output: {
         outDir: string;
@@ -100,6 +101,7 @@ async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): P
         captureHar: scannerConfig.scanner.captureHar,
         saveScreenshots: scannerConfig.scanner.saveScreenshots,
         emulateDevice: scannerConfig.scanner.emulateDevice,
+        extraChromiumArgs: scannerConfig.scanner.extraChromiumArgs,
         outDir: join(__dirname, scannerConfig.output.outDir, url.replace(/^https?:\/\//, '').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+$/g, '')),
         reportDir: join(__dirname, scannerConfig.output.reportDir),
     };
@@ -107,7 +109,7 @@ async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): P
     const config = { ...defaultConfig, ...customConfig };
     const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
 
-    console.log(`Beginning scan of ${url}`);
+    // console.log(`Beginning scan of ${url}`);
 
     const result = await collect(formattedUrl, config);
 
