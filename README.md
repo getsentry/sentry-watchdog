@@ -21,9 +21,11 @@ If you are interested in running it locally you can clone this repository and fo
 
 ## Usage
 
-`npm run example`.
+Update `scanner_config.yaml` on the root folder according to your need, including the `target_list` which is a yaml defined list of sitemaps or rss feeds of pages to scan, and the `output` values to define where the reports will be stored.
 
-Results are stored in `demo-dir` by default
+`npm run scan` to perform the scan on the targets defined in `scanner_config.yaml`
+
+`npm run aggregate` to aggregate the existing reports in `reportDir` and provide an aggregated list of cookies and trackers.
 
 ## Collector configuration
 
@@ -87,7 +89,7 @@ Results are stored in `demo-dir` by default
   - default: uses bundled puppeteer chromium
 - `extraChromiumArgs`
   - Extra flags to pass to Chromium executable
-  - default: ['--disable-features=TrackingProtection3pcd']
+  - default: []
 
 ## Inspection Result
 
@@ -123,7 +125,3 @@ Results are stored in `demo-dir` by default
 
 Blacklight would not be possible without the work of [OpenWPM](https://github.com/mozilla/OpenWPM)
 and the EU-EDPS's [website evidence collector](https://github.com/EU-EDPS/website-evidence-collector)
-
-### Special Thanks
-
-- [JeffreyHung](https://github.com/Jeffreyhung) for contributions related to best-practice chromium configs
