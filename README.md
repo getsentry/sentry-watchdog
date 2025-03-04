@@ -89,7 +89,7 @@ Update `scanner_config.yaml` on the root folder according to your need, includin
   - default: uses bundled puppeteer chromium
 - `extraChromiumArgs`
   - Extra flags to pass to Chromium executable
-  - default: []
+  - default: ['--disable-features=TrackingProtection3pcd']
 
 ## Inspection Result
 
