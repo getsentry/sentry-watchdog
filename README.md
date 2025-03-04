@@ -7,7 +7,7 @@ Sentry took a stand of removing all 3rd party cookeis and trackers from our publ
 - [Removing ad trackers and cookies - the technical perspective - Jeffrey Hung](https://blog.sentry.io/removing-ad-trackers-and-cookies-the-technical-perspective/)
 - [Sentry Cookie Bounty](https://sentry.io/cookiebounty/)
 
-This repository is a tool that we use to helps Sentry look for cookies on our public sites. It's forked and built on top of [blacklight-collector from the Markup](https://github.com/the-markup/blacklight-collector/tree/main?tab=readme-ov-file). For more information about the `blacklight-collector` please read our [methodology](https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector).
+This repository is a tool that we use to helps Sentry look for cookies on our public sites. It's forked and built on top of [blacklight-collector from the Markup](https://github.com/the-markup/blacklight-collector/tree/main?tab=readme-ov-file). For more information about the `blacklight-collector` please read their [methodology](https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector).
 
 If you are interested in running it locally you can clone this repository and follow the instructions below.
 
