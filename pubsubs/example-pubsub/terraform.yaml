@@ -1,7 +1,0 @@
-name: example-pubsub
-description: example pubsub
-pubsub:
-  topic_name: example-pubsub-topic
-  subscription_id: example-pubsub-subscription
-  service_account_id: example-pubsub-sa
-  service_account_display_name: Example PubSub Service Account
