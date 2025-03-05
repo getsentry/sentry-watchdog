@@ -11,6 +11,9 @@ variable "deploy_sa_email" {}
 variable "bucket_location" {}
 variable "zone" {}
 variable "owner" {}
+variable "function_service_accounts" {
+  type = list(string)
+}
 
 module "pubsubs" {
   source   = "../modules/pubsub"
@@ -24,6 +27,7 @@ module "pubsubs" {
   service_account_display_name = each.value.pubsub.service_account_display_name
   ttl                          = lookup(each.value.pubsub, "ttl", null)
   owner                        = var.owner
+  function_service_accounts    = var.function_service_accounts
 }
 
 module "pubsubs_sink" {

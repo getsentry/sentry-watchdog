@@ -34,8 +34,11 @@ module "pubsubs" {
   zone            = var.zone
   deploy_sa_email = var.deploy_sa_email != null ? var.deploy_sa_email : module.infrastructure.deploy_sa_email
   owner           = var.owner
+  function_service_accounts = module.functions.function_trigger_service_accounts
 
   depends_on = [
-    module.infrastructure
+    module.infrastructure,
+    module.functions
+
   ]
 }

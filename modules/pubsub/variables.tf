@@ -38,3 +38,8 @@ variable "owner" {
   type        = string
   description = "The owner of the project, used for tagging resources and future ownership tracking"
 }
+
+variable "function_service_accounts" {
+  type        = list(string)
+  description = "The service accounts of the functions that will be accessing this pub/sub"
+}

@@ -66,3 +66,7 @@ module "cronjob-gen2" {
     module.cloud_function_gen2
   ]
 }
+
+output "function_trigger_service_accounts" {
+  value = [for function in module.cloud_function_gen2 : function.function_trigger_service_account]
+}
