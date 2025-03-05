@@ -107,28 +107,31 @@ if __name__ == "__main__":
 """
 Example format of the message published to pubsub:
 {
- scanner_config:{
-    headless: true
-    numPages: 0
-    captureHar: false
-    saveScreenshots: false
-    emulateDevice:
-      viewport:
-        height: 1920
-        width: 1080
-      userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"
- },
- chunk_no: 1,
- total_chunks: 10,
- chunk_size: 500,
- maxConcurrent: 30,
- target: [
-    "https://page1.com",
-    "https://page2.com",
-    "https://page3.com",
-    "https://page4.com",
-    ...
- ]
+    "title": "Sentry Cookie Scanner",
+    "scanner": {
+        "headless": true,
+        "numPages": 0,
+        "captureHar": false,
+        "saveScreenshots": false,
+        "emulateDevice": {
+            "viewport": {
+                "height": 1920,
+                "width": 1080
+            },
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"
+        }
+    },
+    "maxConcurrent": 30,
+    "chunkSize": 500,
+    "total_pages": 3275,
+    "total_chunks": 7,
+    "chunk_no": 1,
+    "target": [
+        "https://page1.com",
+        "https://page2.com",
+        "https://page3.com",
+        "https://page4.com",
+        ...
+    ]
 }
-
 """
