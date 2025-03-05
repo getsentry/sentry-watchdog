@@ -6,3 +6,20 @@ resource "google_service_account" "gha_cloud_functions_deployment" {
   display_name = "gha-cloud-functions-deployment"
   project      = var.project
 }
+
+resource "google_storage_bucket" "staging_bucket" {
+  name                     = "${var.project}-cloud-function-staging"
+  location                 = "US"
+  force_destroy            = true
+  public_access_prevention = "enforced"
+  labels = {
+    owner = var.owner
+    terraformed = "true"
+  }
+}
+
+resource "google_storage_bucket_iam_member" "staging_bucket_get" {
+  bucket = google_storage_bucket.staging_bucket.name
+  role   = "roles/storage.objectViewer"
+  member = "serviceAccount:${var.deploy_sa_email != null ? var.deploy_sa_email : google_service_account.gha_cloud_functions_deployment[0].email}"
+}
