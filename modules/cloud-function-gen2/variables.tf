@@ -122,3 +122,14 @@ variable "owner" {
   type        = string
   description = "The owner of the project, used for tagging resources and future ownership tracking"
 }
+
+variable "event_trigger" {
+  description = "Event trigger for the cloud function"
+  type = object({
+    event_type = string
+    pubsub_topic = string
+    retry_policy = string
+  })
+  default = null
+  nullable = true
+}

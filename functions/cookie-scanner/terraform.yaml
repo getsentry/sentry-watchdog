@@ -4,3 +4,7 @@ cloud-function-gen2:
   timeout: 3600
   available_memory: 8G 
   runtime: nodejs20
+event-trigger:
+  event_type: google.cloud.pubsub.topic.v1.messagePublished
+  pubsub_topic: page-scanning-pubsub-topic
+  retry_policy: "RETRY_POLICY_RETRY"

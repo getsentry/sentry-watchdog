@@ -37,6 +37,9 @@ module "cloud_function_gen2" {
   }
   secret_environment_variables = lookup(each.value.cloud-function-gen2, "secrets", [])
   ingress_settings             = lookup(each.value.cloud-function-gen2, "ingress_settings", null)
+
+  event_trigger = lookup(each.value, "event-trigger", null)
+
   # passing the static values
   project         = var.project
   secret_ids      = var.secret_ids
