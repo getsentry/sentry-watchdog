@@ -37,6 +37,7 @@ def get_pages_from_feed(feeds):
 
     return pages_to_scan
 
+
 def get_publisher_callback(
     PUBLISH_FUTURES: pubsub_v1.publisher.futures.Future, data: str
 ) -> Callable[[pubsub_v1.publisher.futures.Future], None]:
@@ -48,6 +49,7 @@ def get_publisher_callback(
             print(f"Publishing {data} timed out.")
 
     return callback
+
 
 def main(request):
     # read the sitemap list from target.yaml
@@ -71,29 +73,39 @@ def main(request):
     scanner_config["target"] = []
 
     # break the list of pages into chunks of 100
-    chunks = [pages_to_scan[i:i+scanner_config["chunkSize"]] for i in range(0, len(pages_to_scan), scanner_config["chunkSize"])]
+    chunks = [
+        pages_to_scan[i : i + scanner_config["chunkSize"]]
+        for i in range(0, len(pages_to_scan), scanner_config["chunkSize"])
+    ]
 
     for chunk in chunks:
         scanner_config["chunk_no"] += 1
         scanner_config["target"] = chunk
 
         # publish the chunk to pubsub
-        publish_future = PUBLISHER.publish(TOPIC_PATH, json.dumps(scanner_config).encode("utf-8"))
+        publish_future = PUBLISHER.publish(
+            TOPIC_PATH, json.dumps(scanner_config).encode("utf-8")
+        )
         # Non-blocking. Publish failures are handled in the callback function.
-        publish_future.add_done_callback(get_publisher_callback(publish_future, "Test message"))
+        publish_future.add_done_callback(
+            get_publisher_callback(
+                publish_future,
+                "Chunk %s of %s"
+                % (scanner_config["chunk_no"], scanner_config["total_chunks"]),
+            )
+        )
         PUBLISH_FUTURES.append(publish_future)
 
     futures.wait(PUBLISH_FUTURES, return_when=futures.ALL_COMPLETED)
 
-
-
-    return True
+    return "success"
 
 
 if __name__ == "__main__":
     main(None)
 
-'''
+"""
+Example format of the message published to pubsub:
 {
  scanner_config:{
     headless: true
@@ -119,4 +131,4 @@ if __name__ == "__main__":
  ]
 }
 
-'''
+"""
