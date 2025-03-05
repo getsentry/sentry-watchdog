@@ -1,0 +1,10 @@
+name: page-scanning-pubsub
+description: page scanning pubsub
+pubsub:
+  topic_name: page-scanning-pubsub-topic
+  subscription_id: page-scanning-pubsub-subscription
+  service_account_id: page-scanning-pubsub-sa
+  service_account_display_name: Page Scanning PubSub Service Account
+sink:
+  sink_name: page-scanning-pubsub-sink
+  
