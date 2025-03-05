@@ -96,6 +96,11 @@ cookies.json
 plan
 *.plan
 *tfplan
+tf-plan.json
+tf-plan.create.list
+tf-plan.delete.list
+tf-plan.error.log
+tf-plan.log
 
 # state files
 *.tfstate
