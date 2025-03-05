@@ -1,7 +1,7 @@
 resource "google_service_account" "function_sa" {
   account_id   = "cf-${var.name}"
   display_name = "Cloud Function Service Account for ${var.name}"
-  description = "Service account for ${var.name}, owned by ${var.owner}, managed by Terraform"
+  description  = "Service account for ${var.name}, owned by ${var.owner}, managed by Terraform"
 }
 
 
@@ -67,7 +67,7 @@ resource "google_storage_bucket_object" "zip" {
   source       = data.archive_file.source.output_path
   content_type = "application/zip"
   metadata = {
-    owner = var.owner
+    owner       = var.owner
     terraformed = "true"
   }
 
@@ -81,8 +81,8 @@ resource "google_cloudfunctions2_function" "function" {
   name        = var.name
   location    = var.location
   description = var.description
-  labels      = {
-    owner = var.owner
+  labels = {
+    owner       = var.owner
     terraformed = "true"
   }
 
@@ -120,11 +120,11 @@ resource "google_cloudfunctions2_function" "function" {
   dynamic "event_trigger" {
     for_each = var.event_trigger != null ? [var.event_trigger] : []
     content {
-      event_type = event_trigger.value.event_type
-      pubsub_topic = "projects/${var.project}/topics/${event_trigger.value.pubsub_topic}"
-      retry_policy = event_trigger.value.retry_policy
+      event_type            = event_trigger.value.event_type
+      pubsub_topic          = "projects/${var.project}/topics/${event_trigger.value.pubsub_topic}"
+      retry_policy          = event_trigger.value.retry_policy
       service_account_email = google_service_account.function_sa.email
-      trigger_region = var.location
+      trigger_region        = var.location
     }
   }
 

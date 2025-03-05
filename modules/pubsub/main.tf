@@ -2,7 +2,7 @@
 resource "google_pubsub_topic" "topic" {
   name = var.topic_name
   labels = {
-    owner = var.owner
+    owner       = var.owner
     terraformed = "true"
   }
 
@@ -21,7 +21,7 @@ resource "google_pubsub_subscription" "subscription" {
   ack_deadline_seconds       = 600       # maximum
   enable_message_ordering    = false     # default
   labels = {
-    owner = var.owner
+    owner       = var.owner
     terraformed = "true"
   }
 
@@ -40,7 +40,7 @@ resource "google_pubsub_subscription" "subscription" {
 resource "google_service_account" "pubsub_service_account" {
   account_id   = var.service_account_id
   display_name = var.service_account_display_name
-  description = "Service account for ${var.topic_name}, owned by ${var.owner}, managed by Terraform"
+  description  = "Service account for ${var.topic_name}, owned by ${var.owner}, managed by Terraform"
 }
 
 # Pub/Sub Viewer
@@ -58,7 +58,7 @@ resource "google_pubsub_subscription_iam_member" "subscriber" {
 }
 
 resource "google_pubsub_subscription_iam_member" "function_pubsub_editor" {
-  for_each = toset(var.function_service_accounts)
+  for_each     = toset(var.function_service_accounts)
   subscription = google_pubsub_subscription.subscription.name
   role         = "roles/pubsub.editor"
   member       = "serviceAccount:${each.value}"
@@ -66,9 +66,9 @@ resource "google_pubsub_subscription_iam_member" "function_pubsub_editor" {
 
 resource "google_pubsub_topic_iam_member" "function_topic_publisher" {
   for_each = toset(var.function_service_accounts)
-  topic = google_pubsub_topic.topic.name
-  role         = "roles/pubsub.publisher"
-  member       = "serviceAccount:${each.value}"
+  topic    = google_pubsub_topic.topic.name
+  role     = "roles/pubsub.publisher"
+  member   = "serviceAccount:${each.value}"
 }
 
 # Monitoring Viewer

@@ -1,7 +1,7 @@
 resource "google_service_account" "cronjob_sa" {
   account_id   = "cj-${var.name}"
   display_name = "CronJob Service Account for ${var.name}"
-  description = "Service account for ${var.name}, owned by ${var.owner}, managed by Terraform"
+  description  = "Service account for ${var.name}, owned by ${var.owner}, managed by Terraform"
 }
 
 resource "google_service_account_iam_member" "deploy_sa_actas_iam" {

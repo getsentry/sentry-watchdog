@@ -27,13 +27,13 @@ module "functions" {
 module "pubsubs" {
   source = "./pubsubs"
 
-  project         = var.project
-  region          = var.region
-  project_id      = var.project_id
-  bucket_location = var.bucket_location
-  zone            = var.zone
-  deploy_sa_email = var.deploy_sa_email != null ? var.deploy_sa_email : module.infrastructure.deploy_sa_email
-  owner           = var.owner
+  project                   = var.project
+  region                    = var.region
+  project_id                = var.project_id
+  bucket_location           = var.bucket_location
+  zone                      = var.zone
+  deploy_sa_email           = var.deploy_sa_email != null ? var.deploy_sa_email : module.infrastructure.deploy_sa_email
+  owner                     = var.owner
   function_service_accounts = module.functions.function_trigger_service_accounts
 
   depends_on = [

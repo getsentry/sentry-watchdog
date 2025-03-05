@@ -126,10 +126,10 @@ variable "owner" {
 variable "event_trigger" {
   description = "Event trigger for the cloud function"
   type = object({
-    event_type = string
+    event_type   = string
     pubsub_topic = string
     retry_policy = string
   })
-  default = null
+  default  = null
   nullable = true
 }

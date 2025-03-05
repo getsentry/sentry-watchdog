@@ -13,7 +13,7 @@ resource "google_storage_bucket" "staging_bucket" {
   force_destroy            = true
   public_access_prevention = "enforced"
   labels = {
-    owner = var.owner
+    owner       = var.owner
     terraformed = "true"
   }
 }
