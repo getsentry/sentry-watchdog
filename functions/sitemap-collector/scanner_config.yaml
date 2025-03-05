@@ -9,8 +9,5 @@ scanner:
       height: 1920
       width: 1080
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"
-output:
-  outDir: scan_results # directory to save the raw scan results
-  reportDir: scan_reports # directory to save the aggregated scan reports
-target_list: ./test_target.yaml # path to the target list file
 maxConcurrent: 30 # number of concurrent scans
+chunkSize: 500 # number of pages to scan per chunk

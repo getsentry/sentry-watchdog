@@ -1,0 +1,19 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+functions-framework = "==3.*"
+requests = "==2.31.0"
+xmltodict = "==0.13.0"
+sentry-sdk = "==2.8.0"
+feedparser = "==6.0.10"
+pyyaml = "*"
+google-cloud = "*"
+google-cloud-pubsub = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"

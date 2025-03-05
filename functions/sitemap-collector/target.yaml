@@ -12,4 +12,5 @@ pages:
   - https://sentry.io/auth/login/
   - https://status.sentry.io
   - https://fsl.software
+  # this link wasn't included in rss_feed, including it manually
   - https://sentry.io/changelog

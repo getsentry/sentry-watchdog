@@ -1,1 +1,1 @@
-Example function for the gen2 cloud function
+Pull all the pages in the sitemaps provided and save them to pub/sub
