@@ -1,1 +1,2 @@
-export declare function aggregateReports(): Promise<string>;
+import { ScannerConfig } from './types';
+export declare function aggregateReports(customConfig: ScannerConfig): Promise<string>;

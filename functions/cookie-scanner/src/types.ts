@@ -152,3 +152,30 @@ export const FINGERPRINTABLE_WINDOW_APIS = {
     SCREEN: ['window.screen.pixelDepth', 'window.screen.colorDepth'],
     WEBRTC: ['RTCPeerConnection']
 };
+
+export interface ScannerConfig {
+    title: string;
+    scanner: {
+        headless: boolean;
+        numPages: number;
+        captureHar: boolean;
+        saveScreenshots: boolean;
+        emulateDevice: {
+            viewport: {
+                height: number;
+                width: number;
+            };
+            userAgent: string;
+        };
+        extraChromiumArgs: string[];
+        extraPuppeteerOptions?: {
+            protocolTimeout?: number;
+        };
+    };
+    output: {
+        outDir: string;
+        reportDir: string;
+    };
+    target: string[];
+    maxConcurrent: number;
+}

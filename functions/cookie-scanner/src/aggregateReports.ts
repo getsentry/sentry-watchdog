@@ -1,5 +1,7 @@
 import * as fs from 'fs';
 import { join } from 'path';
+import * as os from 'os';
+import { ScannerConfig } from './types';
 
 interface ScanReport {
     cookies: {
@@ -19,8 +21,13 @@ interface ScanReport {
     };
 }
 
-export async function aggregateReports(): Promise<string> {
-    const reportDir = join(__dirname, '..', 'scan_reports');
+export async function aggregateReports(customConfig: ScannerConfig): Promise<string> {
+    const reportDir = join(os.tmpdir(), customConfig.output.reportDir);
+    
+    if (!fs.existsSync(reportDir)) {
+        fs.mkdirSync(reportDir, { recursive: true });
+    }
+
     const aggregatedReport: ScanReport = {
         cookies: {},
         fb_pixel_events: {},
