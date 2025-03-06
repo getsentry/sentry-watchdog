@@ -71,6 +71,14 @@ resource "google_pubsub_topic_iam_member" "function_topic_publisher" {
   member   = "serviceAccount:${each.value}"
 }
 
+# Pub/Sub Subscriber
+resource "google_pubsub_subscription_iam_member" "function_pubsub_subscriber" {
+  for_each = toset(var.function_service_accounts)
+  subscription = google_pubsub_subscription.subscription.name
+  role         = "roles/pubsub.subscriber"
+  member       = "serviceAccount:${each.value}"
+}
+
 # Monitoring Viewer
 resource "google_project_iam_member" "project" {
   project = var.project_id
