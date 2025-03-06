@@ -2,7 +2,7 @@
   "name": "@getsentry/sentry-cookie-scanner",
   "version": "1.0.0",
   "description": "Cloud function for scanning cookies",
-  "main": "dist/index.js",
+  "main": "src/index.js",
   "scripts": {
     "build": "tsc",
     "deploy": "npm run build && gcloud functions deploy cookie-scanner",
