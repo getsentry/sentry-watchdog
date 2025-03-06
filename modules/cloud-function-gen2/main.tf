@@ -123,7 +123,6 @@ resource "google_cloudfunctions2_function" "function" {
       event_type            = event_trigger.value.event_type
       pubsub_topic          = "projects/${var.project}/topics/${event_trigger.value.pubsub_topic}"
       retry_policy          = event_trigger.value.retry_policy
-      service_account_email = google_service_account.function_sa.email
       trigger_region        = var.location
     }
   }
