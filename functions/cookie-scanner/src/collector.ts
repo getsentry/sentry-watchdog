@@ -18,6 +18,8 @@ import { setupSessionRecordingInspector } from './inspectors/session-recording';
 import { setUpThirdPartyTrackersInspector } from './inspectors/third-party-trackers';
 import { clearDir, closeBrowser } from './utils';
 
+const chromium = require('@sparticuz/chromium');
+
 export type CollectorOptions = Partial<typeof DEFAULT_OPTIONS>;
 
 const DEFAULT_OPTIONS = {
@@ -118,6 +120,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
         ...defaultPuppeteerBrowserOptions,
         args: [...defaultPuppeteerBrowserOptions.args, ...args.extraChromiumArgs],
         headless: args.headless,
+        executablePath: await chromium.executablePath(),
         userDataDir
     };
     if (args.puppeteerExecutablePath) {

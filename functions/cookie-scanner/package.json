@@ -24,8 +24,9 @@
   "homepage": "https://github.com/getsentry/sentry-cookie-scanner#readme",
   "dependencies": {
     "@cliqz/adblocker-puppeteer": "^1.31.1",
-    "@google-cloud/pubsub": "^4.0.0",
     "@google-cloud/functions-framework": "^3.0.0",
+    "@google-cloud/pubsub": "^4.0.0",
+    "@sparticuz/chromium": "^133.0.0",
     "@types/js-yaml": "^4.0.9",
     "axios": "^1.4.0",
     "js-yaml": "^4.1.0",
