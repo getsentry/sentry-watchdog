@@ -22,6 +22,7 @@ module "cloud_function_gen2" {
   runtime               = lookup(each.value.cloud-function-gen2, "runtime", null)
   execution_timeout     = lookup(each.value.cloud-function-gen2, "execution_timeout", null)
   available_memory      = lookup(each.value.cloud-function-gen2, "available_memory", null)
+  available_cpu         = lookup(each.value.cloud-function-gen2, "available_cpu", null)
   allow_unauthenticated = lookup(each.value.cloud-function-gen2, "allow_unauthenticated", null)
   function_entrypoint   = lookup(each.value.cloud-function-gen2, "function_entrypoint", null)
 

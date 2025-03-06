@@ -133,3 +133,10 @@ variable "event_trigger" {
   default  = null
   nullable = true
 }
+
+variable "available_cpu" {
+  type        = number
+  description = "Amount of CPU assigned to each execution"
+  default     = 2
+  nullable    = false
+}
