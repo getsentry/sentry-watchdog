@@ -1,9 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
-    "outDir": "build",
-    "rootDir": "src",
-    "moduleResolution": "node",
+    "target": "es2020",
     "module": "commonjs",
     "declaration": true,
     "inlineSourceMap": true,
@@ -33,6 +30,6 @@
     "types": ["jest", "node", "puppeteer", "winston", "chrome", "firefox-webext-browser"],
     "typeRoots": ["node_modules/@types", "src/types"]
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*"],
   "exclude": ["node_modules", "**/*.spec.ts", "__tests__"]
 }

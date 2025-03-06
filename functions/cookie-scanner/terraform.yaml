@@ -2,7 +2,8 @@ name: cookie-scanner
 description: cookie scanner based on the blacklight-collector
 cloud-function-gen2: 
   timeout: 3600
-  available_memory: 8G 
+  available_memory: 4G 
+  source_directory: dist
   runtime: nodejs20
 event-trigger:
   event_type: google.cloud.pubsub.topic.v1.messagePublished
