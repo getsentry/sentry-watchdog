@@ -4,7 +4,7 @@ declare const DEFAULT_OPTIONS: {
     outDir: string;
     reportDir: string;
     title: string;
-    emulateDevice: import('puppeteer').Device;
+    emulateDevice: import("puppeteer").Device;
     captureHar: boolean;
     captureLinks: boolean;
     enableAdBlock: boolean;

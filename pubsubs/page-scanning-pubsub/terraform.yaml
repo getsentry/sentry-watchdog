@@ -7,4 +7,6 @@ pubsub:
   service_account_display_name: Page Scanning PubSub Service Account
 sink:
   sink_name: page-scanning-pubsub-sink
+cloud_functions: # cloud functions that will be triggered by the pubsub
+  - cookie-scanner
   

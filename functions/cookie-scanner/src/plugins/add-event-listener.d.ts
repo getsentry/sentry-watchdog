@@ -1,1 +1,3 @@
-export declare function instrumentAddEventListener({ instrumentFunctionViaProxy }: { instrumentFunctionViaProxy: any }): void;
+export declare function instrumentAddEventListener({ instrumentFunctionViaProxy }: {
+    instrumentFunctionViaProxy: any;
+}): void;

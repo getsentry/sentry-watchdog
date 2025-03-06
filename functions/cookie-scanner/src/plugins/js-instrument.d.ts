@@ -15,10 +15,7 @@ interface LogSettings {
     recursive?: boolean;
     depth?: number;
 }
-export declare function jsInstruments(
-    loggerHandler: any,
-    StackTrace: any
-): {
+export declare function jsInstruments(loggerHandler: any, StackTrace: any): {
     instrumentFunctionViaProxy: (object: any, objectName: string, property: string) => any;
     instrumentObject: (object: any, objectName: any, logSettings?: LogSettings) => void;
     instrumentObjectProperty: (object: any, objectName: any, propertyName: any, logSettings?: LogSettings) => void;
