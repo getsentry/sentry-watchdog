@@ -65,6 +65,7 @@ target/
 .vscode/
 *.rdb
 build
+dist
 **/*/inspection.json
 **/*/inspection-log.ndjson
 **/*/inspection.json
