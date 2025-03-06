@@ -1,1 +1,1 @@
-export declare function aggregateReports(): Promise<void>;
+export declare function aggregateReports(): Promise<string>;

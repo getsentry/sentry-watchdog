@@ -19,7 +19,7 @@ interface ScanReport {
     }
 }
 
-export async function aggregateReports(): Promise<void> {
+export async function aggregateReports(): Promise<string> {
     const reportDir = join(__dirname, '..', 'scan_reports');
     const aggregatedReport: ScanReport = {
         cookies: {},
@@ -144,13 +144,13 @@ export async function aggregateReports(): Promise<void> {
     //         return obj;
     //     }, {});
 
-    // Write the aggregated report
-    const outputPath = join(__dirname, '..', 'cookies.json');
-    fs.writeFileSync(
-        outputPath,
-        JSON.stringify(aggregatedReport, null, 2),
-        'utf8'
-    );
+    // // Write the aggregated report
+    // const outputPath = join(__dirname, '..', 'cookies.json');
+    // fs.writeFileSync(
+    //     outputPath,
+    //     JSON.stringify(aggregatedReport, null, 2),
+    //     'utf8'
+    // );
 
-    console.log(`Aggregated report written to ${outputPath}`);
+    return JSON.stringify(aggregatedReport);
 } 
