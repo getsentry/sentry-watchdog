@@ -7,7 +7,7 @@ cloud-function-gen2:
     PROJECT_ID: $project_id
     TOPIC_ID: page-scanning-pubsub-topic
 cron:
-  schedule: 0 * * * *
+  schedule: 0 0 * * 0
   time_zone: America/New_York
   attempt_deadline: 320s
   http_method: GET
