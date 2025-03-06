@@ -2,6 +2,9 @@ import * as functions from '@google-cloud/functions-framework';
 import { join } from 'path';
 import { collect, CollectorOptions } from './collector';
 import { aggregateReports } from './aggregateReports';
+import { ScannerConfig } from './types';
+import * as fs from 'fs';
+import * as os from 'os';
 
 export { collect, CollectorOptions } from './collector';
 export { aggregateReports } from './aggregateReports';
@@ -36,33 +39,6 @@ export { aggregateReports } from './aggregateReports';
 //     ]
 // }
 
-interface ScannerConfig {
-    title: string;
-    scanner: {
-        headless: boolean;
-        numPages: number;
-        captureHar: boolean;
-        saveScreenshots: boolean;
-        emulateDevice: {
-            viewport: {
-                height: number;
-                width: number;
-            };
-            userAgent: string;
-        };
-        extraChromiumArgs: string[];
-        extraPuppeteerOptions?: {
-            protocolTimeout?: number;
-        };
-    };
-    output: {
-        outDir: string;
-        reportDir: string;
-    };
-    target: string[];
-    maxConcurrent: number;
-}
-
 async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): Promise<void> {
     const defaultConfig: CollectorOptions = {
         title: customConfig?.title,
@@ -72,14 +48,14 @@ async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): P
         saveScreenshots: customConfig?.saveScreenshots,
         emulateDevice: customConfig?.emulateDevice,
         outDir: join(
-            __dirname,
+            os.tmpdir(),
             customConfig?.outDir || 'out',
             url
                 .replace(/^https?:\/\//, '')
                 .replace(/[^a-zA-Z0-9]/g, '_')
                 .replace(/_+$/g, '')
         ),
-        reportDir: join(__dirname, customConfig?.reportDir || 'reports'),
+        reportDir: join(os.tmpdir(), customConfig?.reportDir || 'reports'),
         extraPuppeteerOptions: {
             protocolTimeout: 60000 // Increase timeout to 60 seconds
         }
@@ -104,13 +80,38 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         // Decode message
         const data = rawMessage.body.message.data ? Buffer.from(rawMessage.body.message.data, 'base64').toString() : '{}';
         const parsedData = JSON.parse(data);
+        console.log("--------------------------------")
+        console.log(parsedData.title, " chunk_no: ", parsedData.chunk_no, " of ", parsedData.total_chunks);
+        console.log("--------------------------------")
 
-        console.log('Processing URL:', parsedData.url);
-        const customConfig = parsedData as ScannerConfig;
+        const { title, scanner, target, maxConcurrent } = parsedData;
+        const customConfig: ScannerConfig = {
+            title,
+            scanner,
+            target,
+            maxConcurrent,
+            output: {
+                outDir: 'out',
+                reportDir: 'reports'
+            }
+        };
+
         let pagesToScan: string[] = parsedData.target;
-        const maxConcurrent = parsedData.maxConcurrent;
         let running = 0;
         const queue = [...pagesToScan];
+
+        try {
+            if (!fs.existsSync(join(os.tmpdir(), customConfig.output.outDir))) {
+                fs.mkdirSync(join(os.tmpdir(), customConfig.output.outDir), { recursive: true });
+            }
+
+            if (!fs.existsSync(join(os.tmpdir(), customConfig.output.reportDir))) {
+                fs.mkdirSync(join(os.tmpdir(), customConfig.output.reportDir), { recursive: true });
+            }
+        } catch (dirError) {
+            console.error('Error creating directories:', dirError);
+            throw dirError;
+        }
 
         async function processNext() {
             while (queue.length > 0 && running < maxConcurrent) {
@@ -120,13 +121,22 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                 // Use immediately invoked async function to handle each scan
                 (async () => {
                     try {
+                        console.log(`Attempting first scan for: ${page}`);
                         await scanUrl(page, customConfig);
+                        console.log(`Successfully completed scan for: ${page}`);
                     } catch (error) {
+                        console.error(`First scan attempt failed for ${page}:`, error);
                         // if failed, try again
-                        await scanUrl(page, customConfig);
+                        try {
+                            console.log(`Attempting retry scan for: ${page}`);
+                            await scanUrl(page, customConfig);
+                            console.log(`Successfully completed retry scan for: ${page}`);
+                        } catch (retryError) {
+                            console.error(`Retry scan failed for ${page}:`, retryError);
+                        }
                     } finally {
                         running--;
-                        // Try to process next item when this one is done
+                        console.log(`Completed processing for: ${page}. Running count: ${running}`);
                         processNext();
                     }
                 })();
@@ -141,15 +151,20 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
             await new Promise(resolve => setTimeout(resolve, 1000));
         }
 
+        console.log('All scans completed, generating aggregate report');
+        const aggregatedReport = await aggregateReports(customConfig);
+        console.log('Successfully generated aggregate report:', aggregatedReport);
+
         res.status(200).json({
             success: true,
-            report: await aggregateReports()
+            report: aggregatedReport
         });
     } catch (error) {
-        console.error('Error processing URL:', error);
+        console.error('Error in main function:', error);
         res.status(500).json({
             success: false,
-            error: error.message
+            error: error.message,
+            stack: error.stack
         });
     }
 });

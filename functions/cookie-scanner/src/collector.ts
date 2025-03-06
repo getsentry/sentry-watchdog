@@ -378,7 +378,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
 
         // console.log('writing inspection.json');
         const json_dump = JSON.stringify({ ...output, reports }, null, 2);
-        writeFileSync(join(args.outDir, 'inspection.json'), json_dump);
+        writeFileSync(join(os.tmpdir(), args.outDir, 'inspection.json'), json_dump);
         if (args.outDir.includes('bl-tmp')) {
             clearDir(args.outDir, false);
         }
@@ -387,7 +387,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
             .replace(/^https?:\/\//, '')
             .replace(/[^a-zA-Z0-9]/g, '_')
             .replace(/_+$/g, '');
-        writeFileSync(join(args.reportDir, `${report_name}.json`), json_dump);
+        writeFileSync(join(os.tmpdir(), args.reportDir, `${report_name}.json`), json_dump);
         return { status: 'success', ...output, reports };
     } finally {
         // close browser and clear tmp dir
