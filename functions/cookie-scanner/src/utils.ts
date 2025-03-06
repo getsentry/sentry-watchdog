@@ -4,8 +4,7 @@ import { join } from 'path';
 import { getDomain } from 'tldts';
 import { BlacklightEvent } from './types';
 
-
-export const hasOwnProperty = (object:object, property:string) => {
+export const hasOwnProperty = (object: object, property: string) => {
     return Object.prototype.hasOwnProperty.call(object, property);
 };
 

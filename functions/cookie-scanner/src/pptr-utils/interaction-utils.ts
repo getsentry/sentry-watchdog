@@ -125,7 +125,7 @@ export const autoScroll = async page => {
                 const distance = 150;
                 const COUNT_MAX = 5;
                 let count = 0;
-                
+
                 const timer = setInterval(() => {
                     const scrollHeight = document.body.scrollHeight;
                     window.scrollBy(0, distance);

@@ -14,7 +14,13 @@ export interface KeyLoggingEvent {
     };
 }
 export interface JsInstrumentEvent {
-    type: 'JsInstrument' | 'JsInstrument.Debug' | 'JsInstrument.Error' | 'JsInstrument.Function' | 'JsInstrument.FunctionProxy' | 'JsInstrument.ObjectProperty';
+    type:
+        | 'JsInstrument'
+        | 'JsInstrument.Debug'
+        | 'JsInstrument.Error'
+        | 'JsInstrument.Function'
+        | 'JsInstrument.FunctionProxy'
+        | 'JsInstrument.ObjectProperty';
     url: string;
     stack: any[];
     data: {

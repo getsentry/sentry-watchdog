@@ -3,20 +3,20 @@ import { join } from 'path';
 
 interface ScanReport {
     cookies: {
-        [key: string]: string[];  // key is "name/domain", value is array of URLs where cookie was found
-    },
+        [key: string]: string[]; // key is "name/domain", value is array of URLs where cookie was found
+    };
     fb_pixel_events: {
         [key: string]: string[];
-    },
+    };
     key_logging: {
         [key: string]: string[];
-    },
+    };
     session_recorders: {
         [key: string]: string[];
-    },
+    };
     third_party_trackers: {
         [key: string]: string[];
-    }
+    };
 }
 
 export async function aggregateReports(): Promise<string> {
@@ -43,14 +43,14 @@ export async function aggregateReports(): Promise<string> {
             if (!url) {
                 console.error(`Report file ${file} has no URL`);
                 continue;
-            };
+            }
 
             // Process cookies from the report
             if (report.reports.cookies && Array.isArray(report.reports.cookies)) {
                 for (const cookie of report.reports.cookies) {
                     if (cookie.name && cookie.domain) {
                         const cookieKey = `${cookie.name}/${cookie.domain}`;
-                        
+
                         if (!aggregatedReport.cookies[cookieKey]) {
                             aggregatedReport.cookies[cookieKey] = [];
                         }
@@ -153,4 +153,4 @@ export async function aggregateReports(): Promise<string> {
     // );
 
     return JSON.stringify(aggregatedReport);
-} 
+}

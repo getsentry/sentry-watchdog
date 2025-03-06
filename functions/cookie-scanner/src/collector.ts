@@ -79,7 +79,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
             headless: args.headless,
             headers: args.headers,
             extraChromiumArgs: args.extraChromiumArgs,
-            extraPuppeteerOptions: args.extraPuppeteerOptions,
+            extraPuppeteerOptions: args.extraPuppeteerOptions
         },
         browser: null,
         script: {
@@ -196,7 +196,6 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
                     waitUntil: waitUntil,
                     timeout: timeout
                 });
-                
             } catch (error) {
                 page_response = await page.goto(url, {
                     timeout: timeout,
@@ -275,7 +274,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
                 await clearCookiesCache(page);
             }
             // console.log(`Browsing now to ${link}`);
-            
+
             await navigateWithTimeout(page, link, args.defaultTimeout, args.defaultWaitUntil as PuppeteerLifeCycleEvent);
 
             await fillForms(page);
@@ -384,7 +383,10 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
             clearDir(args.outDir, false);
         }
         // also save the reports to the report directory
-        const report_name = inUrl.replace(/^https?:\/\//, '').replace(/[^a-zA-Z0-9]/g, '_').replace(/_+$/g, '');
+        const report_name = inUrl
+            .replace(/^https?:\/\//, '')
+            .replace(/[^a-zA-Z0-9]/g, '_')
+            .replace(/_+$/g, '');
         writeFileSync(join(args.reportDir, `${report_name}.json`), json_dump);
         return { status: 'success', ...output, reports };
     } finally {

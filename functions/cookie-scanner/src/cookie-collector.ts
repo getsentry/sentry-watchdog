@@ -97,21 +97,10 @@ export const getJsCookies = (events, url) => {
         )
         .map(d => {
             const data = parseCookie(d.data.value, url);
-            const hasOwnDomain = hasOwnProperty(d, 'domain') && 
-                                 d.domain !== null && 
-                                 d.domain !== undefined;
-            const hasOwnName  = data && 
-                                hasOwnProperty(data, 'key') && 
-                                data.key !== null && 
-                                data.key !== undefined;
-            const hasOwnPath  = data && 
-                                hasOwnProperty(data, 'path') && 
-                                data.path !== null && 
-                                data.path !== undefined;
-            const hasOwnValue = data && 
-                                hasOwnProperty(data, 'value') && 
-                                data.value !== null && 
-                                data.value !== undefined;
+            const hasOwnDomain = hasOwnProperty(d, 'domain') && d.domain !== null && d.domain !== undefined;
+            const hasOwnName = data && hasOwnProperty(data, 'key') && data.key !== null && data.key !== undefined;
+            const hasOwnPath = data && hasOwnProperty(data, 'path') && data.path !== null && data.path !== undefined;
+            const hasOwnValue = data && hasOwnProperty(data, 'value') && data.value !== null && data.value !== undefined;
             const script = getScriptUrl(d);
 
             return {

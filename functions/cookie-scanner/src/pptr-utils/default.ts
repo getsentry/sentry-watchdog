@@ -58,5 +58,5 @@ export const SOCIAL_URLS = [
     'douyin.com',
     'kuaishou.com',
     'weibo.com',
-    'im.qq.com',
+    'im.qq.com'
 ];

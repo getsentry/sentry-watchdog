@@ -9,14 +9,9 @@ import {
     JsInstrumentEvent,
     KeyLoggingEvent,
     SessionRecordingEvent,
-    TrackingRequestEvent,
+    TrackingRequestEvent
 } from './types';
-import { 
-    getScriptUrl, 
-    groupBy, 
-    loadJSONSafely, 
-    hasOwnProperty, 
-} from './utils';
+import { getScriptUrl, groupBy, loadJSONSafely, hasOwnProperty } from './utils';
 
 export const generateReport = (reportType, messages, dataDir, url) => {
     const eventData = getEventData(reportType, messages);

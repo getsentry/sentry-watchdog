@@ -13,12 +13,8 @@ export const getLinks = async (page): Promise<LinkObject[]> => {
                         inner_text: a.innerText
                     };
                 })
-                .filter((link:LinkObject) => {
-                    return (
-                        link.href.startsWith('http') && 
-                        !link.href.endsWith('.pdf') && 
-                        !link.href.endsWith('.zip')
-                    );
+                .filter((link: LinkObject) => {
+                    return link.href.startsWith('http') && !link.href.endsWith('.pdf') && !link.href.endsWith('.zip');
                 });
         } catch (error) {
             return [];
@@ -28,7 +24,7 @@ export const getLinks = async (page): Promise<LinkObject[]> => {
 
 // Uses Set to remove duplicates by reducing LinkObjects to their href property, deduping via Set,
 // then reconstituting an array of full LinkObjects
-export const dedupLinks = (links_with_duplicates: LinkObject[]):LinkObject[] => {
+export const dedupLinks = (links_with_duplicates: LinkObject[]): LinkObject[] => {
     const sanitized_links = links_with_duplicates.filter(f => f && hasOwnProperty(f, 'href')).map(link => link.href);
     const deduped_href_array = Array.from(new Set(sanitized_links));
 
