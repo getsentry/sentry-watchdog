@@ -6,7 +6,11 @@
   "scripts": {
     "build": "tsc",
     "deploy": "npm run build && gcloud functions deploy cookie-scanner",
-    "test": "jest"
+    "test": "jest",
+    "test-server": "node ./config/test-server.js",
+    "fix": "run-s fix:*",
+    "fix:prettier": "prettier \"src/**/*.ts\" --write",
+    "fix:tslint": "tslint -t verbose --fix --project ."
   },
   "repository": {
     "type": "git",
