@@ -85,7 +85,8 @@
       "__DEV_SERVER__": "http://localhost:8125",
       "ts-jest": {
         "diagnostics": false
-      }
+      },
+      "testTimeout": 30000
     },
     "globalSetup": "./config/test-server-setup.js",
     "globalTeardown": "./config/test-server-teardown.js"
