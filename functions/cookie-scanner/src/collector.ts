@@ -11,7 +11,8 @@ import { getLogger } from './logger';
 import { generateReport } from './parser';
 import { defaultPuppeteerBrowserOptions, savePageContent } from './pptr-utils/default';
 import { dedupLinks, getLinks, getSocialLinks } from './pptr-utils/get-links';
-import { autoScroll, fillForms } from './pptr-utils/interaction-utils';
+import { autoScroll } from './pptr-utils/interaction-utils';
+// import { fillForms } from './pptr-utils/interaction-utils';
 import { setupBlacklightInspector } from './inspectors/inspector';
 import { setupKeyLoggingInspector } from './inspectors/key-logging';
 import { setupSessionRecordingInspector } from './inspectors/session-recording';
@@ -255,7 +256,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
                 }
             }
         }
-        await fillForms(page);
+        // await fillForms(page);
         // console.log('... done with fillForms');
         await autoScroll(page);
         // console.log('... done with autoScroll');
@@ -288,7 +289,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
 
             await navigateWithTimeout(page, link, args.defaultTimeout, args.defaultWaitUntil as PuppeteerLifeCycleEvent);
 
-            await fillForms(page);
+            // await fillForms(page);
 
             await new Promise(resolve => setTimeout(resolve, 1000)); // Wait for 1 second
 
