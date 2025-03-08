@@ -46,7 +46,14 @@ async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): P
         numPages: customConfig?.numPages,
         captureHar: customConfig?.captureHar,
         saveScreenshots: customConfig?.saveScreenshots,
-        emulateDevice: customConfig?.emulateDevice,
+        emulateDevice: {
+            viewport: {
+                width: 1280,
+                height: 800
+            },
+            userAgent: customConfig?.emulateDevice?.userAgent || 
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'
+        },
         outDir: join(
             os.tmpdir(),
             customConfig?.outDir || 'out',
@@ -95,6 +102,9 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                 reportDir: 'reports'
             }
         };
+        console.log("--------------------------------")
+        console.log("customeConfig: ", customConfig);
+        console.log("--------------------------------")
 
         let pagesToScan: string[] = parsedData.target;
         let running = 0;

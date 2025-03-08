@@ -101,3 +101,23 @@ export interface ScannerConfig {
     target: string[];
     maxConcurrent: number;
 }
+export interface CollectorOptions {
+    title?: string;
+    headless?: boolean;
+    numPages?: number;
+    captureHar?: boolean;
+    saveScreenshots?: boolean;
+    emulateDevice: {
+        viewport: {
+            width: number;
+            height: number;
+        };
+        userAgent: string;
+    };
+    extraChromiumArgs?: string[];
+    extraPuppeteerOptions?: {
+        protocolTimeout?: number;
+    };
+    outDir?: string;
+    reportDir?: string;
+}

@@ -18,7 +18,7 @@ import { setupSessionRecordingInspector } from './inspectors/session-recording';
 import { setUpThirdPartyTrackersInspector } from './inspectors/third-party-trackers';
 import { clearDir, closeBrowser } from './utils';
 
-const chromium = require('@sparticuz/chromium');
+import chromium from '@sparticuz/chromium';
 
 export type CollectorOptions = Partial<typeof DEFAULT_OPTIONS>;
 
@@ -118,14 +118,22 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
 
     const options = {
         ...defaultPuppeteerBrowserOptions,
-        args: [...defaultPuppeteerBrowserOptions.args, ...args.extraChromiumArgs],
-        headless: args.headless,
+        args: [
+            ...chromium.args,
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            `--user-agent=${args.emulateDevice.userAgent}`,
+            ...args.extraChromiumArgs
+        ],
+        defaultViewport: {
+            width: args.emulateDevice.viewport.width,
+            height: args.emulateDevice.viewport.height
+        },
         executablePath: await chromium.executablePath(),
+        headless: chromium.headless,
+        ignoreHTTPSErrors: true,
         userDataDir
     };
-    if (args.puppeteerExecutablePath) {
-        options['executablePath'] = args.puppeteerExecutablePath;
-    }
     try {
         browser = await puppeteer.launch(options);
         browser.on('disconnected', () => {
