@@ -42,3 +42,21 @@ module "pubsubs" {
 
   ]
 }
+
+module "gcs" {
+  source = "./gcs"
+
+  project                   = var.project
+  region                    = var.region
+  project_id                = var.project_id
+  bucket_location           = var.bucket_location
+  zone                      = var.zone
+  deploy_sa_email           = var.deploy_sa_email != null ? var.deploy_sa_email : module.infrastructure.deploy_sa_email
+  owner                     = var.owner
+
+  depends_on = [
+    module.infrastructure,
+    module.functions
+
+  ]
+}
