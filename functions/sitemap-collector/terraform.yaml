@@ -1,7 +1,7 @@
 name: sitemap-collector
 description: collect all the pages in the sitemaps provided and save them to pub/sub
 cloud-function-gen2: 
-  timeout: 60
+  execution_timeout: 60
   available_memory: 256M
   environment_variables:
     PROJECT_ID: $project_id
