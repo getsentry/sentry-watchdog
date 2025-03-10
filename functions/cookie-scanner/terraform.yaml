@@ -3,7 +3,7 @@ description: cookie scanner based on the blacklight-collector
 cloud-function-gen2: 
   execution_timeout: 3600
   available_memory: 8Gi
-  available_cpu: 8
+  available_cpu: 12
   source_directory: src
   runtime: nodejs20
 event-trigger:
