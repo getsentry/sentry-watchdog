@@ -64,7 +64,15 @@ async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): P
         ),
         reportDir: join(os.tmpdir(), customConfig?.reportDir || 'reports'),
         extraPuppeteerOptions: {
-            protocolTimeout: 60000 // Increase timeout to 60 seconds
+            protocolTimeout: 120000, // Increase timeout to 2 minutes
+            timeout: 120000, // Page timeout
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-accelerated-2d-canvas',
+                '--disable-gpu'
+            ]
         }
     };
 
@@ -102,9 +110,6 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                 reportDir: 'reports'
             }
         };
-        console.log("--------------------------------")
-        console.log("customeConfig: ", customConfig);
-        console.log("--------------------------------")
 
         let pagesToScan: string[] = parsedData.target;
         let running = 0;
