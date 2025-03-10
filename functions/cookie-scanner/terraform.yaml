@@ -8,6 +8,7 @@ cloud-function-gen2:
   runtime: nodejs20
   environment_variables:
     SENTRY_DSN: $sentry_dsn
+    AGGREGATE_REPORTS_BUCKET: aggregated-reports-storage
 event-trigger:
   event_type: google.cloud.pubsub.topic.v1.messagePublished
   pubsub_topic: page-scanning-pubsub-topic

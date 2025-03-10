@@ -1,4 +1,5 @@
 import * as functions from '@google-cloud/functions-framework';
+import { Storage } from "@google-cloud/storage";
 import { join } from 'path';
 import { collect, CollectorOptions } from './collector';
 import { aggregateReports } from './aggregateReports';
@@ -98,6 +99,23 @@ async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): P
     }
 }
 
+const bucketName = process.env.AGGREGATE_REPORTS_BUCKET;
+const today = new Date().toISOString().slice(0, 10).replace(/-/g, ""); // Format: YYYYMMDD
+const folderName = `${today}/`; // Folder with today's date
+
+async function uploadReportToGCS(reportPath: string, bucketName: string, folderName: string) {
+    const storage = new Storage();
+    const bucket = storage.bucket(bucketName);
+    try {
+        await bucket.upload(reportPath, {
+            destination: `${folderName}${reportPath}`
+        });
+    } catch (error) {
+        console.error('Error uploading report to GCS:', error);
+        Sentry.captureException(error);
+        throw error;
+    }
+}
 
 
 export const main = functions.http('main', async (rawMessage: functions.Request, res: functions.Response) => {
@@ -180,6 +198,8 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         console.log('All scans completed, generating aggregate report');
         const aggregatedReport = await aggregateReports(customConfig);
         console.log('Successfully generated aggregate report:', aggregatedReport);
+        await uploadReportToGCS(aggregatedReport, bucketName, folderName);
+        console.log('Successfully uploaded aggregate report to GCS');
 
         res.status(200).json({
             success: true,
