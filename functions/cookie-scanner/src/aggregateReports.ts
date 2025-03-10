@@ -1,6 +1,5 @@
 import * as fs from 'fs';
 import { join } from 'path';
-import * as os from 'os';
 import { ScannerConfig } from './types';
 
 interface ScanReport {
@@ -22,7 +21,7 @@ interface ScanReport {
 }
 
 export async function aggregateReports(customConfig: ScannerConfig): Promise<string> {
-    const reportDir = join(os.tmpdir(), customConfig.output.reportDir);
+    const reportDir = join(customConfig.output.reportDir);
     
     if (!fs.existsSync(reportDir)) {
         fs.mkdirSync(reportDir, { recursive: true });
