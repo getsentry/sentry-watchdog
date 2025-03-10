@@ -138,14 +138,12 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                     try {
                         console.log(`Attempting first scan for: ${page}`);
                         await scanUrl(page, customConfig);
-                        console.log(`Successfully completed scan for: ${page}`);
                     } catch (error) {
-                        console.error(`First scan attempt failed for ${page}:`, error);
+                        console.log(`First scan attempt failed for ${page}:`, error);
                         // if failed, try again
                         try {
                             console.log(`Attempting retry scan for: ${page}`);
                             await scanUrl(page, customConfig);
-                            console.log(`Successfully completed retry scan for: ${page}`);
                         } catch (retryError) {
                             console.error(`Retry scan failed for ${page}:`, retryError);
                         }
