@@ -6,6 +6,8 @@ cloud-function-gen2:
   available_cpu: 8
   source_directory: src
   runtime: nodejs20
+  environment_variables:
+    SENTRY_DSN: $sentry_dsn
 event-trigger:
   event_type: google.cloud.pubsub.topic.v1.messagePublished
   pubsub_topic: page-scanning-pubsub-topic

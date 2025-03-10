@@ -6,6 +6,7 @@ cloud-function-gen2:
   environment_variables:
     PROJECT_ID: $project_id
     TOPIC_ID: page-scanning-pubsub-topic
+    SENTRY_DSN: $sentry_dsn
 cron:
   schedule: 0 0 * * 0
   time_zone: America/New_York

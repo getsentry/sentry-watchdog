@@ -33,6 +33,11 @@ variable "tf_state_bucket" {
   description = "The name of the tfstate bucket"
 }
 
+variable "sentry_dsn" {
+  type        = string
+  description = "The sentry dsn"
+}
+
 variable "deploy_sa_email" {
   type        = string
   description = "service account for deployment"

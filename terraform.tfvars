@@ -5,6 +5,7 @@ project_id      = "sentry-cookie-scanner"
 project_num     = "695686394944"
 bucket_location = "US-WEST1"
 tf_state_bucket = "sentry-cookie-scanner-infra"
+sentry_dsn      = "https://39d93e532415311821aaa75fbba3b851@o1.ingest.us.sentry.io/4508955969060864"
 # Owner of the project, used for tagging resources and future ownership tracking
 owner = "team-security"
 

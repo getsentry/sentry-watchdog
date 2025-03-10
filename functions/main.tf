@@ -11,6 +11,7 @@ variable "secret_ids" {}
 variable "deploy_sa_email" {}
 variable "local_variables" {}
 variable "owner" {}
+variable "sentry_dsn" {}
 
 module "cloud_function_gen2" {
   source   = "../modules/cloud-function-gen2"

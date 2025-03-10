@@ -6,6 +6,8 @@ import { ScannerConfig } from './types';
 import * as fs from 'fs';
 import * as os from 'os';
 
+import * as Sentry from "@sentry/node";
+
 export { collect, CollectorOptions } from './collector';
 export { aggregateReports } from './aggregateReports';
 
@@ -38,6 +40,12 @@ export { aggregateReports } from './aggregateReports';
 //         ...
 //     ]
 // }
+
+Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    tracesSampleRate: 1.0, 
+    environment: "cookie-scanner",
+});
 
 async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): Promise<void> {
     const defaultConfig: CollectorOptions = {
@@ -90,6 +98,8 @@ async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): P
     }
 }
 
+
+
 export const main = functions.http('main', async (rawMessage: functions.Request, res: functions.Response) => {
     try {
         // Decode message
@@ -125,6 +135,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
             }
         } catch (dirError) {
             console.error('Error creating directories:', dirError);
+            Sentry.captureException(dirError);
             throw dirError;
         }
 
@@ -139,12 +150,14 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                         console.log(`Attempting first scan for: ${page}`);
                         await scanUrl(page, customConfig);
                     } catch (error) {
+                        Sentry.captureException(`First scan attempt failed for ${page}:`, error);
                         console.log(`First scan attempt failed for ${page}:`, error);
                         // if failed, try again
                         try {
                             console.log(`Attempting retry scan for: ${page}`);
                             await scanUrl(page, customConfig);
                         } catch (retryError) {
+                            Sentry.captureException(`Retry scan failed for ${page}:`, retryError);
                             console.error(`Retry scan failed for ${page}:`, retryError);
                         }
                     } finally {
@@ -174,6 +187,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         });
     } catch (error) {
         console.error('Error in main function:', error);
+        Sentry.captureException(error);
         res.status(500).json({
             success: false,
             error: error.message,
