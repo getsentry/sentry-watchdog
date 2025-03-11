@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import { join } from 'path';
 import { ScannerConfig } from './types';
-
+import * as os from 'os';
 interface ScanReport {
     cookies: {
         [key: string]: string[]; // key is "name/domain", value is array of URLs where cookie was found
@@ -21,7 +21,7 @@ interface ScanReport {
 }
 
 export async function aggregateReports(customConfig: ScannerConfig): Promise<string> {
-    const reportDir = join(customConfig.output.reportDir);
+    const reportDir = join(os.tmpdir(),customConfig.output.reportDir);
     
     if (!fs.existsSync(reportDir)) {
         fs.mkdirSync(reportDir, { recursive: true });
