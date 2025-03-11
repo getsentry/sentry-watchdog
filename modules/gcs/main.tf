@@ -1,6 +1,6 @@
 resource "google_storage_bucket" "bucket" {
-  name     = var.bucket_name
-  location = var.gcp_region
+  name                     = var.bucket_name
+  location                 = var.gcp_region
   public_access_prevention = "enforced"
   labels = {
     owner = var.owner

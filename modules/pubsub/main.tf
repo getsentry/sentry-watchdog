@@ -73,7 +73,7 @@ resource "google_pubsub_topic_iam_member" "function_topic_publisher" {
 
 # Pub/Sub Subscriber
 resource "google_pubsub_subscription_iam_member" "function_pubsub_subscriber" {
-  for_each = toset(var.function_service_accounts)
+  for_each     = toset(var.function_service_accounts)
   subscription = google_pubsub_subscription.subscription.name
   role         = "roles/pubsub.subscriber"
   member       = "serviceAccount:${each.value}"

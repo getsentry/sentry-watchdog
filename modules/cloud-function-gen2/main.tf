@@ -121,10 +121,10 @@ resource "google_cloudfunctions2_function" "function" {
   dynamic "event_trigger" {
     for_each = var.event_trigger != null ? [var.event_trigger] : []
     content {
-      event_type            = event_trigger.value.event_type
-      pubsub_topic          = "projects/${var.project}/topics/${event_trigger.value.pubsub_topic}"
-      retry_policy          = event_trigger.value.retry_policy
-      trigger_region        = var.location
+      event_type     = event_trigger.value.event_type
+      pubsub_topic   = "projects/${var.project}/topics/${event_trigger.value.pubsub_topic}"
+      retry_policy   = event_trigger.value.retry_policy
+      trigger_region = var.location
     }
   }
 
