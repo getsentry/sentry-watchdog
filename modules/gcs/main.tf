@@ -23,6 +23,6 @@ resource "google_storage_bucket_iam_member" "cloud_functions_gcs_read" {
 resource "google_storage_bucket_iam_member" "cloud_functions_gcs_write" {
   for_each = toset(var.cloud_functions_write)
   bucket   = google_storage_bucket.bucket.name
-  role     = "roles/storage.objectCreator"
+  role     = "roles/storage.objectUser"
   member   = "serviceAccount:cf-${each.value}@${var.project_id}.iam.gserviceaccount.com"
 }
