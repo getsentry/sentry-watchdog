@@ -103,13 +103,18 @@ const bucketName = process.env.AGGREGATE_REPORTS_BUCKET;
 const today = new Date().toISOString().slice(0, 10).replace(/-/g, ""); // Format: YYYYMMDD
 const folderName = `${today}/`; // Folder with today's date
 
-async function uploadReportToGCS(reportPath: string, bucketName: string, folderName: string) {
+async function uploadReportToGCS(file_name: string, report: string, bucketName: string, folderName: string) {
     const storage = new Storage();
     const bucket = storage.bucket(bucketName);
+    const file = bucket.file(`${folderName}${file_name}.json`);
     try {
-        await bucket.upload(reportPath, {
-            destination: `${folderName}${reportPath}`
+        await file.save(report, {
+            public: false,
+            metadata: {
+                contentType: 'application/json'
+            }
         });
+        console.log(`Successfully uploaded report to GCS: ${file_name}`);
     } catch (error) {
         console.error('Error uploading report to GCS:', error);
         Sentry.captureException(error);
@@ -198,7 +203,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         console.log('All scans completed, generating aggregate report');
         const aggregatedReport = await aggregateReports(customConfig);
         console.log('Successfully generated aggregate report:', aggregatedReport);
-        await uploadReportToGCS(aggregatedReport, bucketName, folderName);
+        await uploadReportToGCS(parsedData.chunk_no, aggregatedReport, bucketName, folderName);
         console.log('Successfully uploaded aggregate report to GCS');
 
         res.status(200).json({
