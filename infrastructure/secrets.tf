@@ -14,6 +14,6 @@ resource "google_secret_manager_secret" "secret" {
 # we decided to place them here instead of under each functions
 locals {
   secrets = [
-    "test_key_1",
+    "log_forwarding_auth",
   ]
 }

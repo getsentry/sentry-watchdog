@@ -4,7 +4,7 @@ gcs:
   bucket_name: aggregated-reports-storage
   service_account_id: aggregated-reports-storage-sa
   service_account_display_name: Aggregated Reports Storage Service Account
-# cloud_functions_read: # cloud functions that need read access
-#   - cookie-auditor
+cloud_functions_read: # cloud functions that need read access
+  - cookie-auditor
 cloud_functions_write: # cloud functions that need write access
   - cookie-scanner

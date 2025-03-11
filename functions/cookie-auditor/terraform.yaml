@@ -1,17 +1,18 @@
-name: example-gen2-cron
-description: gen2 cloud function example
+name: cookie-auditor
+description: Check found cookies against a list of known cookies
 cloud-function-gen2: 
   timeout: 120
   available_memory: 256M
-  environment_variables: 
-    ENV_1: $project_id # value will be pulled from terraform.tfvars
-    ENV_2: 345
+  environment_variables:
+    SENTRY_DSN: $sentry_dsn
+    AGGREGATE_REPORTS_BUCKET: aggregated-reports-storage
+    LOG_DESTINATION: https://logs.sentry.runpanther.net/http/fe0ab37f-eb1e-4471-b650-faa21096bd68
   secrets:
-    - key: test_key_1
-      secret: test_key_1
+    - key: LOG_FORWARDING_AUTH_TOKEN
+      secret: log_forwarding_auth
       version: latest
 cron:
-  schedule: 0 * * * *
+  schedule: 0 2 * * 0
   time_zone: America/New_York
   attempt_deadline: 320s
   http_method: GET

@@ -1,4 +1,144 @@
+import os
+from datetime import datetime, timezone
+import json
+from datetime import datetime, timezone
+import logging
+import requests
+import sentry_sdk
+from sentry_sdk import set_tag
+from sentry_sdk.integrations.serverless import serverless_function
+from google.cloud import storage
+from collections import defaultdict
+
+SENTRY_DSN = os.environ.get("SENTRY_DSN")
+AGGREGATE_REPORTS_BUCKET = os.environ.get("AGGREGATE_REPORTS_BUCKET")
+LOG_DESTINATION = os.environ.get("LOG_DESTINATION")
+
+UNKNOWN_COOKIES_TEMPLATE = {
+    "cookies": {},
+    "fb_pixel_events": {},
+    "key_logging": {},
+    "session_recorders": {},
+    "third_party_trackers": {},
+}
+
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        traces_sample_rate=1.0,
+        profiles_sample_rate=1.0,
+    )
+
+
+def identify_unknow_cookies(known_cookies, cookie_found):
+    unknown_cookies = {}
+    for category, category_data in cookie_found.items():
+        if category:
+            for key in category_data:
+                if key not in known_cookies[category]:
+                    if category not in unknown_cookies:
+                        unknown_cookies[category] = {}
+                    unknown_cookies[category][key] = category_data[key]
+    return unknown_cookies
+
+
+# Forward logs to SIEM webhook
+def log_forwarding(data):
+    headers = {
+        "Authorization": f"Bearer {os.environ['LOG_FORWARDING_AUTH_TOKEN']}",
+        "Content-Type": "application/json",
+    }
+    response = requests.post(
+        LOG_DESTINATION, json=data, headers=headers, timeout=10
+    )
+
+    # Check the response
+    if response.status_code == 200 or response.status_code == 204:
+        print("Logs forwarded successfully")
+    else:
+        logging.error("Failed to forward logs. Status code:", response.status_code)
+        logging.error("Response content:", response.content)
+
+
+def combine_reports(bucket_name):
+    folder_name = datetime.now(timezone.utc).strftime("%Y%m%d")
+
+    reports = retrieve_reports_from_bucket(bucket_name, folder_name)
+    reports = merge_dicts(reports)
+    # # save to file
+    # with open("combined_reports.json", "w") as f:
+    #     json.dump(reports, f)
+
+    return reports
+
+
+def retrieve_reports_from_bucket(bucket_name, folder_name):
+    client = storage.Client()
+    bucket = client.bucket(bucket_name)
+    blobs = bucket.list_blobs(prefix=folder_name)
+    reports = []
+    for blob in blobs:
+        # Parse the JSON string into a dictionary
+        report_data = json.loads(blob.download_as_string().decode("utf-8"))
+        reports.append(report_data)
+    return reports
+
+
+def merge_dicts(dicts):
+    merged = defaultdict(lambda: defaultdict(list))
+
+    for d in dicts:
+        if d:
+            for category, category_data in d.items():
+                if category:
+                    for key, links in category_data.items():
+                        merged[category][key].extend(links)
+
+    # Convert back to a normal dictionary and remove duplicates in lists
+    return {
+        category: {key: list(set(links)) for key, links in sub_dict.items()}
+        for category, sub_dict in merged.items()
+    }
+
+
+@serverless_function
 def main(request):
-    print("********TEST********")
-    return "Hello there"
-    
+    # import approved cookies from json file
+    known_cookies = json.load(open("known_cookies.json"))
+    print("known_cookies", known_cookies)
+
+    scan_result = combine_reports(AGGREGATE_REPORTS_BUCKET)
+    print("scan_result", scan_result)
+
+    # # compare found cookies and approved cookies
+    unknown_cookies = identify_unknow_cookies(known_cookies, scan_result)
+    print("unknown_cookies", unknown_cookies)
+
+    # # save to file
+    # with open("unknown_cookies.json", "w") as f:
+    #     json.dump(unknown_cookies, f)
+
+    if unknown_cookies:
+        alert_message = {
+            "status": "alert",
+            "message": "unknown cookie found",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "data": unknown_cookies,
+        }
+        log_forwarding(alert_message)
+        logging.error(alert_message)
+        return alert_message
+    else:
+        success_message = {
+            "status": "success",  # required, string
+            "message": "scan completed, no unknown cookie found",  # required, string
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "data": scan_result,
+        }
+        log_forwarding(success_message)
+        print("**** No Unknown Cookie****")
+        return success_message
+
+
+if __name__ == "__main__":
+    main()

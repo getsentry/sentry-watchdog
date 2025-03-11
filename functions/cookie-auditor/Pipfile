@@ -1,0 +1,15 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+functions-framework = "==3.*"
+requests = "==2.31.0"
+sentry-sdk = "==2.8.0"
+google-cloud-storage = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.11"
