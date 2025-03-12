@@ -160,6 +160,7 @@ async function uploadReportToGCS(file_name: string, report: string, bucketName: 
 
 export const main = functions.http('main', async (rawMessage: functions.Request, res: functions.Response) => {
     const startTime = Date.now();
+    const failedPages: string[] = [];
     try {
         // Decode message
         const data = rawMessage.body.message.data ? Buffer.from(rawMessage.body.message.data, 'base64').toString() : '{}';
@@ -246,6 +247,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                                 "message": `Retry scan failed for ${page}`,
                                 "timestamp": new Date().toISOString(),
                             });
+                            failedPages.push(page);
                         }
                     } finally {
                         running--;
@@ -279,6 +281,18 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                 "time_spent": `${((Date.now() - startTime) / 1000).toFixed(2)}s`
             }
         });
+
+        if (failedPages.length > 0) {
+            logForwarding({
+                "status": "error",
+                "message": "failed pages",
+                "timestamp": new Date().toISOString(),
+                "data": {
+                    "job_id": job_id,
+                    "failed_pages": failedPages
+                }
+            });
+        }
 
         // Explicitly ACK by returning 200
         res.status(200).json({
