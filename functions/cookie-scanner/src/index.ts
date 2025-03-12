@@ -97,9 +97,17 @@ async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): P
     const result = await collect(formattedUrl, config);
 
     if (result.status === 'success') {
-        console.log(`Scan successful: ${config.outDir}`);
+        logForwarding({
+            "status": "info",
+            "message": `page scanned: ${url}`,
+            "timestamp": new Date().toISOString(),
+        })
     } else {
-        console.error(`Scan failed: ${result.page_response}`);
+        logForwarding({
+            "status": "info",
+            "message": `page scanned: ${url}`,
+            "timestamp": new Date().toISOString(),
+        })
     }
 }
 
@@ -237,12 +245,6 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                         }
                     } finally {
                         running--;
-                        console.log(`Completed processing for: ${page}. Running count: ${running}`);
-                        logForwarding({
-                            "status": "info",
-                            "message": `page scanned: ${page}`,
-                            "timestamp": new Date().toISOString(),
-                        })
                         processNext();
                     }
                 })();

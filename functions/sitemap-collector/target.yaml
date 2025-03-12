@@ -1,8 +1,8 @@
 sitemaps:
-  - https://sentry.io/sitemap/sitemap-0.xml
-  - https://blog.sentry.io/sitemap/sitemap-0.xml
-  - https://answers.sentry.dev/sitemap/sitemap-0.xml
-  - https://sentry.zendesk.com/hc/sitemap.xml
+  # - https://sentry.io/sitemap/sitemap-0.xml
+  # - https://blog.sentry.io/sitemap/sitemap-0.xml
+  # - https://answers.sentry.dev/sitemap/sitemap-0.xml
+  # - https://sentry.zendesk.com/hc/sitemap.xml
   - https://sentry.engineering/sitemap.xml
   - https://sentry.design/sitemap-0.xml
   - https://open.sentry.io/sitemap/sitemap-0.xml
