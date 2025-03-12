@@ -3,6 +3,7 @@ import fs from 'fs';
 import { join } from 'path';
 import { getDomain } from 'tldts';
 import { BlacklightEvent } from './types';
+import { Browser } from 'puppeteer';
 
 export const hasOwnProperty = (object: object, property: string) => {
     return Object.prototype.hasOwnProperty.call(object, property);
@@ -27,17 +28,40 @@ const deleteFolderRecursive = path => {
 // This is an annoying hack to get around an issue in Puppeteer
 // where the browser.close method hangs indefinitely
 // See https://github.com/Sparticuz/chromium/issues/85#issuecomment-1527692751
-export const closeBrowser = async browser => {
-    // console.log('closing browser');
-    const pages = await browser.pages();
-    for (let i = 0; i < pages.length; i++) {
-        await pages[i].close();
+export const closeBrowser = async (browser: Browser) => {
+    try {
+        // First try to close all pages
+        const pages = await browser.pages();
+        await Promise.all(pages.map(async (page) => {
+            try {
+                await page.close({ runBeforeUnload: false });
+            } catch (e) {
+                // Ignore individual page close errors
+            }
+        }));
+
+        // Then close the browser with a timeout
+        const browserClosePromise = browser.close();
+        const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Browser close timeout')), 30000)
+        );
+
+        await Promise.race([browserClosePromise, timeoutPromise])
+            .catch(async (error) => {
+                // Log the error that caused the normal close to fail
+                console.error('Browser close failed:', error);
+                // If normal close fails, try force closing the browser process
+                try {
+                    browser.process()?.kill('SIGKILL');
+                } catch (killError) {
+                    // If even force kill fails, log it but don't throw
+                    console.error('Failed to force kill browser:', killError);
+                }
+            });
+    } catch (error) {
+        // Log error but don't throw to ensure cleanup continues
+        console.error('Error during browser cleanup:', error);
     }
-    const childProcess = browser.process();
-    if (childProcess) {
-        childProcess.kill(9);
-    }
-    await browser.close();
 };
 
 export const clearDir = (outDir, mkNewDir = true) => {

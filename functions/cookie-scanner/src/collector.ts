@@ -55,6 +55,32 @@ const DEFAULT_OPTIONS = {
     extraPuppeteerOptions: {} as Partial<PuppeteerLaunchOptions>
 };
 
+const cleanupBeforeClose = async (page: Page) => {
+    try {
+        // Clear all listeners
+        await page.removeAllListeners();
+        
+        // Stop any media playback
+        await page.evaluate(() => {
+            document.querySelectorAll('video, audio').forEach((media: HTMLMediaElement) => {
+                try {
+                    media.pause();
+                    media.remove();
+                } catch (e) {}
+            });
+        });
+        
+        // Clear memory
+        await page.evaluate(() => {
+            if (window.gc) {
+                window.gc();
+            }
+        });
+    } catch (e) {
+        // Ignore cleanup errors
+    }
+};
+
 export const collect = async (inUrl: string, args: CollectorOptions) => {
     args = { ...DEFAULT_OPTIONS, ...args };
     clearDir(args.outDir);
@@ -139,6 +165,14 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
         browser = await puppeteer.launch(options);
         browser.on('disconnected', () => {
             didBrowserDisconnect = true;
+            // Attempt cleanup of any remaining processes
+            try {
+                if (browser.process()) {
+                    browser.process()?.kill('SIGKILL');
+                }
+            } catch (e) {
+                // Ignore cleanup errors
+            }
         });
 
         if (didBrowserDisconnect) {
@@ -308,6 +342,8 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
             // console.log('... done saving har');
         }
 
+        const pages = await browser.pages();
+        await Promise.all(pages.map(cleanupBeforeClose));
         await closeBrowser(browser);
         if (typeof userDataDir !== 'undefined') {
             clearDir(userDataDir, false);
@@ -404,6 +440,8 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
     } finally {
         // close browser and clear tmp dir
         if (browser && !didBrowserDisconnect) {
+            const pages = await browser.pages();
+            await Promise.all(pages.map(cleanupBeforeClose));
             await closeBrowser(browser);
         }
         // if (typeof userDataDir !== 'undefined') {
