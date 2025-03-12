@@ -277,21 +277,25 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
             }
         })
 
+        // Explicitly ACK by returning 200
         res.status(200).json({
             success: true,
+            messageId: rawMessage.body.message.messageId, // Include message ID in response
             report: aggregatedReport
         });
     } catch (error) {
+        // Explicitly NACK by returning 500
         console.error('Error in main function:', error);
         logForwarding({
             "status": "error",
             "message": "scanner failed",
             "timestamp": new Date().toISOString(),
             "data": error.message
-        })
+        });
         Sentry.captureException(error);
         res.status(500).json({
             success: false,
+            messageId: rawMessage.body.message.messageId,
             error: error.message,
             stack: error.stack
         });
