@@ -1,7 +1,6 @@
 import os
 from datetime import datetime, timezone
 import json
-from datetime import datetime, timezone
 import logging
 import requests
 import sentry_sdk
@@ -44,20 +43,21 @@ def identify_unknow_cookies(known_cookies, cookie_found):
 
 # Forward logs to SIEM webhook
 def log_forwarding(data):
-    headers = {
-        "Authorization": f"Bearer {os.environ['LOG_FORWARDING_AUTH_TOKEN']}",
-        "Content-Type": "application/json",
-    }
-    response = requests.post(
-        LOG_DESTINATION, json=data, headers=headers, timeout=10
-    )
+    if LOG_DESTINATION:
+        headers = {
+            "Authorization": f"Bearer {os.environ['LOG_FORWARDING_AUTH_TOKEN']}",
+            "Content-Type": "application/json",
+        }
+        response = requests.post(
+            LOG_DESTINATION, json=data, headers=headers, timeout=10
+        )
 
-    # Check the response
-    if response.status_code == 200 or response.status_code == 204:
-        print("Logs forwarded successfully")
-    else:
-        logging.error("Failed to forward logs. Status code:", response.status_code)
-        logging.error("Response content:", response.content)
+        # Check the response
+        if response.status_code == 200 or response.status_code == 204:
+            print("Logs forwarded successfully")
+        else:
+            logging.error("Failed to forward logs. Status code:", response.status_code)
+            logging.error("Response content:", response.content)
 
 
 def combine_reports(bucket_name):
