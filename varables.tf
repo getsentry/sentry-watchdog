@@ -28,14 +28,10 @@ variable "bucket_location" {
   description = "The location for GCS bucket"
 }
 
-variable "tf_state_bucket" {
-  type        = string
-  description = "The name of the tfstate bucket"
-}
-
 variable "sentry_dsn" {
   type        = string
   description = "The sentry dsn"
+  default     = "https://11111111111111111111111111111111@o1.ingest.us.sentry.io/1111111111111111"
 }
 
 variable "deploy_sa_email" {
@@ -47,6 +43,12 @@ variable "deploy_sa_email" {
 variable "owner" {
   type        = string
   description = "The owner of the project, used for tagging resources and future ownership tracking"
+}
+
+variable "log_destination" {
+  type        = string
+  description = "The log destination"
+  default     = null
 }
 
 # A hack to turn all var in the tfvars file into a variable map
