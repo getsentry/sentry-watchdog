@@ -15,7 +15,6 @@ from google.cloud import pubsub_v1
 import sentry_sdk
 from sentry_sdk.integrations.gcp import GcpIntegration
 
-sentry_sdk.init(os.environ.get("SENTRY_DSN"))
 PROJECT_ID = os.environ.get("PROJECT_ID")
 TOPIC_ID = os.environ.get("TOPIC_ID")
 LOG_DESTINATION = os.environ.get("LOG_DESTINATION")
@@ -25,7 +24,7 @@ TOPIC_PATH = PUBLISHER.topic_path(PROJECT_ID, TOPIC_ID)
 PUBLISH_FUTURES = []
 
 sentry_sdk.init(
-    dsn="https://39d93e532415311821aaa75fbba3b851@o1.ingest.us.sentry.io/4508955969060864",
+    dsn=os.environ.get("SENTRY_DSN"),
     # Add data like request headers and IP for users, if applicable;
     # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
     send_default_pii=True,
