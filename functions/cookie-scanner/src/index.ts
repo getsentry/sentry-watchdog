@@ -132,6 +132,14 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         console.log(parsedData.title, " chunk_no: ", parsedData.chunk_no, " of ", parsedData.total_chunks);
         console.log("--------------------------------")
 
+        const metadata = {
+            title: parsedData.title,
+            date: folderName,
+            chunk_no: parsedData.chunk_no,
+            total_chunks: parsedData.total_chunks,
+            total_pages: parsedData.total_pages
+        }
+
         const { title, scanner, target, maxConcurrent } = parsedData;
         const customConfig: ScannerConfig = {
             title,
@@ -202,8 +210,9 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
 
         console.log('All scans completed, generating aggregate report');
         const aggregatedReport = await aggregateReports(customConfig);
-        console.log('Successfully generated aggregate report:', aggregatedReport);
-        await uploadReportToGCS(parsedData.chunk_no, aggregatedReport, bucketName, folderName);
+        const result = {metadata, result: aggregatedReport}
+        console.log('Successfully generated aggregate report:', result);
+        await uploadReportToGCS(parsedData.chunk_no, JSON.stringify(result), bucketName, folderName);
         console.log('Successfully uploaded aggregate report to GCS');
 
         res.status(200).json({

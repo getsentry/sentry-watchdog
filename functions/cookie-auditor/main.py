@@ -76,20 +76,46 @@ def retrieve_reports_from_bucket(bucket_name, folder_name):
     client = storage.Client()
     bucket = client.bucket(bucket_name)
     blobs = bucket.list_blobs(prefix=folder_name)
+    expected_report_count = 0
+    report_count = 0
     reports = []
+    if not blobs:
+        alert_message = {
+            "status": "alert",
+            "message": "No reports found in the bucket",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        log_forwarding(alert_message)
+        logging.error(alert_message)
+
+        exit()
+
     for blob in blobs:
         # Parse the JSON string into a dictionary
         report_data = json.loads(blob.download_as_string().decode("utf-8"))
-        reports.append(report_data)
+        reports.append(json.loads(report_data["result"]))
+        expected_report_count = report_data["metadata"]["total_chunks"]
+        report_count += 1
+    if report_count != expected_report_count:
+        alert_message = {
+            "status": "alert",
+            "message": f"Report missing: {expected_report_count - len(blobs)}",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        log_forwarding(alert_message)
+        logging.error(alert_message)
+    else:
+        print("All reports found: ", report_count)
+        logging.info("All reports found: ", report_count)
     return reports
 
 
-def merge_dicts(dicts):
+def merge_dicts(list_of_dicts):
     merged = defaultdict(lambda: defaultdict(list))
 
-    for d in dicts:
-        if d:
-            for category, category_data in d.items():
+    for dict in list_of_dicts:
+        if dict:
+            for category, category_data in dict.items():
                 if category:
                     for key, links in category_data.items():
                         merged[category][key].extend(links)
@@ -105,14 +131,14 @@ def merge_dicts(dicts):
 def main(request):
     # import approved cookies from json file
     known_cookies = json.load(open("known_cookies.json"))
-    print("known_cookies", known_cookies)
+    print(f"known_cookies: {known_cookies}")
 
     scan_result = combine_reports(AGGREGATE_REPORTS_BUCKET)
-    print("scan_result", scan_result)
+    print(f"scan_result: {scan_result}")
 
     # # compare found cookies and approved cookies
     unknown_cookies = identify_unknow_cookies(known_cookies, scan_result)
-    print("unknown_cookies", unknown_cookies)
+    print(f"unknown_cookies: {unknown_cookies}")
 
     # # save to file
     # with open("unknown_cookies.json", "w") as f:
