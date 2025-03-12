@@ -125,7 +125,7 @@ async function logForwarding(data: Record<string, any>): Promise<void> {
             const response = await axios.post(LOG_DESTINATION, data, { headers, timeout: 10000 });
             
             if (response.status === 200 || response.status === 204) {
-                console.log("Logs forwarded successfully");
+                
             } else {
                 Sentry.captureException(response.data);
             }
