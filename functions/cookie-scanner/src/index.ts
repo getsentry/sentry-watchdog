@@ -117,11 +117,10 @@ async function logForwarding(data: Record<string, any>): Promise<void> {
             if (response.status === 200 || response.status === 204) {
                 console.log("Logs forwarded successfully");
             } else {
-                console.error("Failed to forward logs. Status code:", response.status);
-                console.error("Response content:", response.data);
+                Sentry.captureException(response.data);
             }
         } catch (error) {
-            console.error("Error forwarding logs:", error);
+            Sentry.captureException(error);
         }
     }
 }
@@ -141,9 +140,8 @@ async function uploadReportToGCS(file_name: string, report: string, bucketName: 
                 contentType: 'application/json'
             }
         });
-        console.log(`Successfully uploaded report to GCS: ${file_name}`);
+        console.log(`Successfully uploaded report to GCS: https://storage.googleapis.com/${bucketName}/${folderName}${parsedData.chunk_no}.json`);
     } catch (error) {
-        console.error('Error uploading report to GCS:', error);
         Sentry.captureException(error);
         throw error;
     }
@@ -216,11 +214,9 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                 // Use immediately invoked async function to handle each scan
                 (async () => {
                     try {
-                        console.log(`Attempting first scan for: ${page}`);
                         await scanUrl(page, customConfig);
                     } catch (error) {
                         Sentry.captureException(`First scan attempt failed for ${page}:`, error);
-                        console.log(`First scan attempt failed for ${page}:`, error);
                         logForwarding({
                             "status": "info",
                             "message": `First scan failed for ${page}`,
@@ -264,12 +260,10 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         console.log('All scans completed, generating aggregate report');
         const aggregatedReport = await aggregateReports(customConfig);
         const result = {metadata, result: aggregatedReport}
-        console.log('Successfully generated aggregate report:', result);
         await uploadReportToGCS(parsedData.chunk_no, JSON.stringify(result), bucketName, folderName);
-        console.log('Successfully uploaded aggregate report to GCS');
         logForwarding({
             "status": "info",
-            "message": "scanner completed",
+            "message": "chunk scan completed",
             "timestamp": new Date().toISOString(),
             "data": {
                 "chunk_no": parsedData.chunk_no,
@@ -287,7 +281,6 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         });
     } catch (error) {
         // Explicitly NACK by returning 500
-        console.error('Error in main function:', error);
         logForwarding({
             "status": "error",
             "message": "scanner failed",
