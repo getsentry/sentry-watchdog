@@ -6,6 +6,7 @@ import { aggregateReports } from './aggregateReports';
 import { ScannerConfig } from './types';
 import * as fs from 'fs';
 import * as os from 'os';
+import axios from "axios";
 
 import * as Sentry from "@sentry/node";
 
@@ -47,6 +48,9 @@ Sentry.init({
     tracesSampleRate: 1.0, 
     environment: "cookie-scanner",
 });
+
+const LOG_DESTINATION = process.env.LOG_DESTINATION;
+const LOG_FORWARDING_AUTH_TOKEN = process.env.LOG_FORWARDING_AUTH_TOKEN;
 
 async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): Promise<void> {
     const defaultConfig: CollectorOptions = {
@@ -99,6 +103,29 @@ async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): P
     }
 }
 
+// Forward logs to SIEM webhook
+async function logForwarding(data: Record<string, any>): Promise<void> {
+    if (LOG_DESTINATION && LOG_FORWARDING_AUTH_TOKEN) {
+        const headers = {
+            "Authorization": `Bearer ${LOG_FORWARDING_AUTH_TOKEN}`,
+            "Content-Type": "application/json",
+        };
+
+        try {
+            const response = await axios.post(LOG_DESTINATION, data, { headers, timeout: 10000 });
+            
+            if (response.status === 200 || response.status === 204) {
+                console.log("Logs forwarded successfully");
+            } else {
+                console.error("Failed to forward logs. Status code:", response.status);
+                console.error("Response content:", response.data);
+            }
+        } catch (error) {
+            console.error("Error forwarding logs:", error);
+        }
+    }
+}
+
 const bucketName = process.env.AGGREGATE_REPORTS_BUCKET;
 const today = new Date().toISOString().slice(0, 10).replace(/-/g, ""); // Format: YYYYMMDD
 const folderName = `${today}/`; // Folder with today's date
@@ -131,6 +158,16 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         console.log("--------------------------------")
         console.log(parsedData.title, " chunk_no: ", parsedData.chunk_no, " of ", parsedData.total_chunks);
         console.log("--------------------------------")
+        logForwarding({
+            "status": "info",
+            "message": "scanner started",
+            "timestamp": new Date().toISOString(),
+            "data": {
+                "chunk_no": parsedData.chunk_no,
+                "total_chunks": parsedData.total_chunks,
+                "total_pages": parsedData.total_pages
+            }
+        })
 
         const metadata = {
             title: parsedData.title,
@@ -183,6 +220,11 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                     } catch (error) {
                         Sentry.captureException(`First scan attempt failed for ${page}:`, error);
                         console.log(`First scan attempt failed for ${page}:`, error);
+                        logForwarding({
+                            "status": "info",
+                            "message": `First scan failed for ${page}`,
+                            "timestamp": new Date().toISOString(),
+                        })
                         // if failed, try again
                         try {
                             console.log(`Attempting retry scan for: ${page}`);
@@ -190,10 +232,20 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                         } catch (retryError) {
                             Sentry.captureException(`Retry scan failed for ${page}:`, retryError);
                             console.error(`Retry scan failed for ${page}:`, retryError);
+                            logForwarding({
+                                "status": "info",
+                                "message": `Retry scan failed for ${page}`,
+                                "timestamp": new Date().toISOString(),
+                            })
                         }
                     } finally {
                         running--;
                         console.log(`Completed processing for: ${page}. Running count: ${running}`);
+                        logForwarding({
+                            "status": "info",
+                            "message": `page scanned: ${page}`,
+                            "timestamp": new Date().toISOString(),
+                        })
                         processNext();
                     }
                 })();
@@ -214,6 +266,16 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         console.log('Successfully generated aggregate report:', result);
         await uploadReportToGCS(parsedData.chunk_no, JSON.stringify(result), bucketName, folderName);
         console.log('Successfully uploaded aggregate report to GCS');
+        logForwarding({
+            "status": "info",
+            "message": "scanner completed",
+            "timestamp": new Date().toISOString(),
+            "data": {
+                "chunk_no": parsedData.chunk_no,
+                "total_chunks": parsedData.total_chunks,
+                "report_url": `https://storage.googleapis.com/${bucketName}/${folderName}${parsedData.chunk_no}.json`
+            }
+        })
 
         res.status(200).json({
             success: true,
@@ -221,6 +283,12 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         });
     } catch (error) {
         console.error('Error in main function:', error);
+        logForwarding({
+            "status": "error",
+            "message": "scanner failed",
+            "timestamp": new Date().toISOString(),
+            "data": error.message
+        })
         Sentry.captureException(error);
         res.status(500).json({
             success: false,
