@@ -151,6 +151,7 @@ async function uploadReportToGCS(file_name: string, report: string, bucketName: 
 
 
 export const main = functions.http('main', async (rawMessage: functions.Request, res: functions.Response) => {
+    const startTime = Date.now();
     try {
         // Decode message
         const data = rawMessage.body.message.data ? Buffer.from(rawMessage.body.message.data, 'base64').toString() : '{}';
@@ -273,7 +274,8 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
             "data": {
                 "chunk_no": parsedData.chunk_no,
                 "total_chunks": parsedData.total_chunks,
-                "report_url": `https://storage.googleapis.com/${bucketName}/${folderName}${parsedData.chunk_no}.json`
+                "report_url": `https://storage.googleapis.com/${bucketName}/${folderName}${parsedData.chunk_no}.json`,
+                "time_spent": `${((Date.now() - startTime) / 1000).toFixed(2)}s`
             }
         })
 
