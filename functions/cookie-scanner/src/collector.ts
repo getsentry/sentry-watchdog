@@ -215,8 +215,8 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
                 });
             }
             // Wait for network to be idle and additional time for dynamic content
-            await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 3000 }).catch(() => {});
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            await page.waitForNavigation({ waitUntil: 'networkidle2', timeout: 30000 }).catch(() => {});
+            await new Promise(resolve => setTimeout(resolve, 30000));
             await savePageContent(pageIndex, args.outDir, page, args.saveScreenshots);
         };
 
