@@ -18,7 +18,6 @@ module "functions" {
   deploy_sa_email = var.deploy_sa_email != null ? var.deploy_sa_email : module.infrastructure.deploy_sa_email
   local_variables = local.local_variables # this passes the vars in terraform.tfvars to module as a map, this is a hack to make the vars available to the yamls
   owner           = var.owner
-  sentry_dsn      = var.sentry_dsn
 
   depends_on = [
     module.infrastructure
