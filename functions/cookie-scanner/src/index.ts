@@ -140,7 +140,7 @@ async function uploadReportToGCS(file_name: string, report: string, bucketName: 
                 contentType: 'application/json'
             }
         });
-        console.log(`Successfully uploaded report to GCS: https://storage.googleapis.com/${bucketName}/${folderName}${parsedData.chunk_no}.json`);
+        console.log(`Successfully uploaded report to GCS: https://storage.googleapis.com/${bucketName}/${folderName}${file_name}.json`);
     } catch (error) {
         Sentry.captureException(error);
         throw error;
@@ -216,7 +216,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                     try {
                         await scanUrl(page, customConfig);
                     } catch (error) {
-                        Sentry.captureException(`First scan attempt failed for ${page}:`, error);
+                        Sentry.captureMessage(`First scan attempt failed for ${page}:`, error);
                         logForwarding({
                             "status": "info",
                             "message": `First scan failed for ${page}`,
@@ -224,11 +224,11 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                         })
                         // if failed, try again
                         try {
-                            console.log(`Attempting retry scan for: ${page}`);
+                            console.log(`[${parsedData.chunk_no}/${parsedData.total_chunks}] Attempting retry scan for: ${page}`);
                             await scanUrl(page, customConfig);
                         } catch (retryError) {
                             Sentry.captureException(`Retry scan failed for ${page}:`, retryError);
-                            console.error(`Retry scan failed for ${page}:`, retryError);
+                            console.error(`[${parsedData.chunk_no}/${parsedData.total_chunks}] Retry scan failed for ${page}:`, retryError);
                             logForwarding({
                                 "status": "info",
                                 "message": `Retry scan failed for ${page}`,
