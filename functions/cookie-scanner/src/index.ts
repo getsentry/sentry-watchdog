@@ -52,33 +52,36 @@ Sentry.init({
 const LOG_DESTINATION = process.env.LOG_DESTINATION;
 const LOG_FORWARDING_AUTH_TOKEN = process.env.LOG_FORWARDING_AUTH_TOKEN;
 
-async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): Promise<void> {
-    const defaultConfig: CollectorOptions = {
-        title: customConfig?.title,
-        headless: customConfig?.headless,
-        numPages: customConfig?.numPages,
-        captureHar: customConfig?.captureHar,
-        saveScreenshots: customConfig?.saveScreenshots,
-        emulateDevice: {
+async function scanUrl(url: string, config: ScannerConfig): Promise<void> {
+    const scannerConfig: CollectorOptions = {
+        title: config?.title,
+        headless: config?.scanner?.headless,
+        numPages: config?.scanner?.numPages,
+        captureHar: config?.scanner?.captureHar,
+        saveScreenshots: config?.scanner?.saveScreenshots,
+        emulateDevice: config?.scanner?.emulateDevice || {
             viewport: {
                 width: 1280,
                 height: 800
             },
-            userAgent: customConfig?.emulateDevice?.userAgent || 
-                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'
         },
         outDir: join(
             os.tmpdir(),
-            customConfig?.outDir || 'out',
+            config?.output?.outDir || 'out',
             url
                 .replace(/^https?:\/\//, '')
                 .replace(/[^a-zA-Z0-9]/g, '_')
                 .replace(/_+$/g, '')
         ),
-        reportDir: join(os.tmpdir(), customConfig?.reportDir || 'reports'),
+        reportDir: join(os.tmpdir(), config?.output?.reportDir || 'reports'),
+        extraChromiumArgs: config?.scanner?.extraChromiumArgs || [
+            '--disable-features=TrackingProtection3pcd'
+        ],
         extraPuppeteerOptions: {
-            protocolTimeout: 120000, // Increase timeout to 2 minutes
-            timeout: 120000, // Page timeout
+            protocolTimeout: 120000,
+            timeout: 120000,
+            ...config?.scanner?.extraPuppeteerOptions,
             args: [
                 '--no-sandbox',
                 '--disable-setuid-sandbox',
@@ -89,12 +92,11 @@ async function scanUrl(url: string, customConfig?: Partial<CollectorOptions>): P
         }
     };
 
-    const config = { ...defaultConfig, ...customConfig };
     const formattedUrl = url.startsWith('http') ? url : `https://${url}`;
 
     // console.log(`Beginning scan of ${url}`);
 
-    const result = await collect(formattedUrl, config);
+    const result = await collect(formattedUrl, scannerConfig);
 
     if (result.status === 'success') {
         logForwarding({
@@ -226,10 +228,10 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                     try {
                         await scanUrl(page, customConfig);
                     } catch (error) {
-                        Sentry.captureMessage(`First scan attempt failed for ${page}:`, error);
+                        // Sentry.captureMessage(`First scan attempt failed for ${page}:`, error);
                         logForwarding({
                             "status": "info",
-                            "message": `First scan failed for ${page}`,
+                            "message": `${job_id} First scan failed for ${page}`,
                             "timestamp": new Date().toISOString(),
                         });
                         // if failed, try again
