@@ -1,6 +1,6 @@
 title: Sentry Cookie Scanner
 scanner:
-  headless: true
+  headless: false
   numPages: 0
   captureHar: false
   saveScreenshots: false
@@ -9,7 +9,7 @@ scanner:
       height: 1920
       width: 1080
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"
-# number of concurrent scans
-maxConcurrent: 20 
- # number of pages to scan per chunk
-chunkSize: 100
+
+# Note: pubsub message expires after 10 minutes, so we want to keep each chunk under 10 minutes
+maxConcurrent: 40 # number of concurrent scans
+chunkSize: 120 # number of pages to scan per chunk
