@@ -152,7 +152,6 @@ def main(request):
             "data": unknown_cookies,
         }
         log_forwarding(alert_message)
-        logging.error(alert_message)
         return alert_message
     else:
         success_message = {
