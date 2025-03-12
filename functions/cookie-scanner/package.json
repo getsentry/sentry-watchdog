@@ -30,7 +30,7 @@
     "@sentry/google-cloud-serverless": "^9.5.0",
     "@sparticuz/chromium": "^133.0.0",
     "@types/js-yaml": "^4.0.9",
-    "axios": "^1.4.0",
+    "axios": "^1.8.3",
     "js-yaml": "^4.1.0",
     "lodash.flatten": "^4.4.0",
     "lodash.samplesize": "^4.2.0",
