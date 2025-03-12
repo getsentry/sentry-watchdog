@@ -148,7 +148,7 @@ async function uploadReportToGCS(file_name: string, report: string, bucketName: 
                 contentType: 'application/json'
             }
         });
-        console.log(`Successfully uploaded report to GCS: https://storage.googleapis.com/${bucketName}/${folderName}${file_name}.json`);
+        console.log(`Successfully uploaded report to GCS: https://storage.cloud.google.com/${bucketName}/${folderName}${file_name}.json`);
     } catch (error) {
         Sentry.captureException(error);
         throw error;
@@ -195,10 +195,12 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                 reportDir: 'reports'
             }
         };
+        const job_id = `[${parsedData.chunk_no}/${parsedData.total_chunks}]`
 
         let pagesToScan: string[] = parsedData.target;
         let running = 0;
         const queue = [...pagesToScan];
+        const scanPromises: Promise<void>[] = []; // Track all scan promises
 
         try {
             if (!fs.existsSync(join(os.tmpdir(), customConfig.output.outDir))) {
@@ -219,8 +221,8 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                 const page = queue.shift()!;
                 running++;
 
-                // Use immediately invoked async function to handle each scan
-                (async () => {
+                // Create promise for each scan and track it
+                const scanPromise = (async () => {
                     try {
                         await scanUrl(page, customConfig);
                     } catch (error) {
@@ -229,40 +231,41 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                             "status": "info",
                             "message": `First scan failed for ${page}`,
                             "timestamp": new Date().toISOString(),
-                        })
+                        });
                         // if failed, try again
                         try {
-                            console.log(`[${parsedData.chunk_no}/${parsedData.total_chunks}] Attempting retry scan for: ${page}`);
+                            console.log(`${job_id} Attempting retry scan for: ${page}`);
                             await scanUrl(page, customConfig);
                         } catch (retryError) {
                             Sentry.captureException(`Retry scan failed for ${page}:`, retryError);
-                            console.error(`[${parsedData.chunk_no}/${parsedData.total_chunks}] Retry scan failed for ${page}:`, retryError);
+                            console.error(`${job_id} Retry scan failed for ${page}:`, retryError);
                             logForwarding({
                                 "status": "info",
                                 "message": `Retry scan failed for ${page}`,
                                 "timestamp": new Date().toISOString(),
-                            })
+                            });
                         }
                     } finally {
                         running--;
-                        processNext();
                     }
                 })();
+                
+                scanPromises.push(scanPromise);
+                processNext(); // Continue processing next items
             }
         }
 
         // Start the processing
         await processNext();
 
-        // Wait until all scans are complete
-        while (running > 0) {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-        }
+        // Wait for ALL scan promises to complete
+        await Promise.allSettled(scanPromises);
 
-        console.log('All scans completed, generating aggregate report');
+        console.log(`${job_id} All scans completed, generating aggregate report`);
         const aggregatedReport = await aggregateReports(customConfig);
-        const result = {metadata, result: aggregatedReport}
+        const result = {metadata, result: aggregatedReport};
         await uploadReportToGCS(parsedData.chunk_no, JSON.stringify(result), bucketName, folderName);
+        
         logForwarding({
             "status": "info",
             "message": "chunk scan completed",
@@ -273,12 +276,12 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                 "report_url": `https://storage.googleapis.com/${bucketName}/${folderName}${parsedData.chunk_no}.json`,
                 "time_spent": `${((Date.now() - startTime) / 1000).toFixed(2)}s`
             }
-        })
+        });
 
         // Explicitly ACK by returning 200
         res.status(200).json({
             success: true,
-            messageId: rawMessage.body.message.messageId, // Include message ID in response
+            messageId: rawMessage.body.message.messageId,
             report: aggregatedReport
         });
     } catch (error) {
