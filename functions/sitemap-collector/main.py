@@ -3,17 +3,22 @@ import yaml
 import json
 import math
 import requests
+import logging
 import xmltodict
+from datetime import datetime, timezone
 import feedparser
-from google.cloud import pubsub_v1
 from concurrent import futures
 from typing import Callable
+
+from google.cloud import pubsub_v1
+
 import sentry_sdk
 from sentry_sdk.integrations.gcp import GcpIntegration
 
 sentry_sdk.init(os.environ.get("SENTRY_DSN"))
 PROJECT_ID = os.environ.get("PROJECT_ID")
 TOPIC_ID = os.environ.get("TOPIC_ID")
+LOG_DESTINATION = os.environ.get("LOG_DESTINATION")
 
 PUBLISHER = pubsub_v1.PublisherClient()
 TOPIC_PATH = PUBLISHER.topic_path(PROJECT_ID, TOPIC_ID)
@@ -30,6 +35,23 @@ sentry_sdk.init(
     environment="sitemap-collector",
 )
 
+# Forward logs to SIEM webhook
+def log_forwarding(data):
+    if LOG_DESTINATION:
+        headers = {
+            "Authorization": f"Bearer {os.environ['LOG_FORWARDING_AUTH_TOKEN']}",
+            "Content-Type": "application/json",
+        }
+        response = requests.post(
+            LOG_DESTINATION, json=data, headers=headers, timeout=10
+        )
+
+        # Check the response
+        if response.status_code == 200 or response.status_code == 204:
+            print("Logs forwarded successfully")
+        else:
+            logging.error("Failed to forward logs. Status code:", response.status_code)
+            logging.error("Response content:", response.content)
 
 
 def get_pages_from_site(sitemaps):
@@ -112,6 +134,17 @@ def main(request):
         PUBLISH_FUTURES.append(publish_future)
 
     futures.wait(PUBLISH_FUTURES, return_when=futures.ALL_COMPLETED)
+
+    logging_message = {
+        "status": "success",
+        "message": "sitemap collecting completed",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "data": {
+            "total_pages": page_count,
+            "total_chunks": scanner_config["total_chunks"],
+        },
+    }
+    log_forwarding(logging_message)
 
     return "success"
 
