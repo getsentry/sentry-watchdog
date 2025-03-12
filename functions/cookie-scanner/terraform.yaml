@@ -9,6 +9,11 @@ cloud-function-gen2:
   environment_variables:
     SENTRY_DSN: $sentry_dsn
     AGGREGATE_REPORTS_BUCKET: aggregated-reports-storage
+    LOG_DESTINATION: $log_destination
+  secrets:
+    - key: LOG_FORWARDING_AUTH_TOKEN
+      secret: log_forwarding_auth
+      version: latest
 event-trigger:
   event_type: google.cloud.pubsub.topic.v1.messagePublished
   pubsub_topic: page-scanning-pubsub-topic
