@@ -161,7 +161,29 @@ async function uploadReportToGCS(file_name: string, report: string, bucketName: 
 export const main = functions.http('main', async (rawMessage: functions.Request, res: functions.Response) => {
     const startTime = Date.now();
     const failedPages: string[] = [];
+
+    // Add deadline extension functionality
+    let isProcessing = true;
+    const extendDeadline = async () => {
+        while (isProcessing) {
+            try {
+                // Extend deadline every 8 minutes (480000ms)
+                // We do this before the 10-minute ACK deadline to ensure we don't miss it
+                await new Promise(resolve => setTimeout(resolve, 480000));
+                if (isProcessing) {
+                    // If still processing, extend deadline by sending a 102 Processing status
+                    res.writeProcessing();
+                }
+            } catch (error) {
+                Sentry.captureException(error);
+            }
+        }
+    };
+
     try {
+        // Start deadline extension in the background
+        extendDeadline();
+
         // Decode message
         const data = rawMessage.body.message.data ? Buffer.from(rawMessage.body.message.data, 'base64').toString() : '{}';
         const parsedData = JSON.parse(data);
@@ -265,6 +287,9 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         // Wait for ALL scan promises to complete
         await Promise.allSettled(scanPromises);
 
+        // Stop the deadline extension
+        isProcessing = false;
+
         console.log(`${job_id} All scans completed, generating aggregate report`);
         const aggregatedReport = await aggregateReports(customConfig);
         const result = {metadata, result: aggregatedReport};
@@ -301,6 +326,9 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
             report: aggregatedReport
         });
     } catch (error) {
+        // Stop the deadline extension
+        isProcessing = false;
+
         // Explicitly NACK by returning 500
         logForwarding({
             "status": "error",
