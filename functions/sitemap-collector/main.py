@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 import feedparser
 from concurrent import futures
 from typing import Callable
+import random
 
 from google.cloud import pubsub_v1
 
@@ -107,6 +108,9 @@ def main(request):
     scanner_config["total_chunks"] = math.ceil(page_count / scanner_config["chunkSize"])
     scanner_config["chunk_no"] = 0
     scanner_config["target"] = []
+
+    # shuffle the pages so that resources will be distributed more evenly across the chunks
+    random.shuffle(pages_to_scan)
 
     # break the list of pages into chunks of 100
     chunks = [
