@@ -99,17 +99,19 @@ async function scanUrl(url: string, config: ScannerConfig): Promise<void> {
     const result = await collect(formattedUrl, scannerConfig);
 
     if (result.status === 'success') {
-        logForwarding({
-            "status": "info",
-            "message": `page scanned: ${url}`,
-            "timestamp": new Date().toISOString(),
-        })
+        // These are too noise for logs, disable for now
+        // logForwarding({
+        //     "status": "info",
+        //     "message": `page scanned: ${url}`,
+        //     "timestamp": new Date().toISOString(),
+        // })
     } else {
-        logForwarding({
-            "status": "info",
-            "message": `page scanned: ${url}`,
-            "timestamp": new Date().toISOString(),
-        })
+        // These are too noise for logs, disable for now
+        // logForwarding({
+        //     "status": "info",
+        //     "message": `page scanned: ${url}`,
+        //     "timestamp": new Date().toISOString(),
+        // })
     }
 }
 
@@ -251,12 +253,13 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                     try {
                         await scanUrl(page, customConfig);
                     } catch (error) {
+                        // These are too noise for logs, disable for now
                         // Sentry.captureMessage(`First scan attempt failed for ${page}:`, error);
-                        logForwarding({
-                            "status": "info",
-                            "message": `${job_id} First scan failed for ${page}`,
-                            "timestamp": new Date().toISOString(),
-                        });
+                        // logForwarding({
+                        //     "status": "info",
+                        //     "message": `${job_id} First scan failed for ${page}`,
+                        //     "timestamp": new Date().toISOString(),
+                        // });
                         // if failed, try again
                         try {
                             console.log(`${job_id} Attempting retry scan for: ${page}`);
