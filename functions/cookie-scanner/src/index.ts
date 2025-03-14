@@ -21,6 +21,12 @@ Sentry.init({
 
 const LOG_DESTINATION = process.env.LOG_DESTINATION;
 const LOG_FORWARDING_AUTH_TOKEN = process.env.LOG_FORWARDING_AUTH_TOKEN;
+const LOG_FORMAT = { //Represents the required fields for the log parsing schema
+    status: "",
+    message: "",
+    timestamp: new Date().toISOString(),
+    data: {}
+};
 
 async function scanUrl(url: string, config: ScannerConfig): Promise<void> {
     const scannerConfig: CollectorOptions = {
