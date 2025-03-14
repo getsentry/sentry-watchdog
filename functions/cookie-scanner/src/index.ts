@@ -165,7 +165,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         // Decode message
         const data = rawMessage.body.message.data ? Buffer.from(rawMessage.body.message.data, 'base64').toString() : '{}';
         const parsedData = JSON.parse(data);
-        const job_id = `${folderName} - [${parsedData.chunk_no}/${parsedData.total_chunks}]`
+        const job_id = `${today}[${parsedData.chunk_no}/${parsedData.total_chunks}]`
         console.log("--------------------------------")
         console.log(parsedData.title, " chunk_no: ", parsedData.chunk_no, " of ", parsedData.total_chunks);
         console.log("--------------------------------")
