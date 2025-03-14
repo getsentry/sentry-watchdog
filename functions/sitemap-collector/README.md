@@ -5,39 +5,9 @@ This cloud function will take all the sitemaps, feeds, or pages you provided, pu
 
 
 ## Input
-[scanner_config.yaml](./scanner_config.yaml) is the config file for the scanner, it will decide how scanner will scan your page. You can also control how many pages you want to scan simultaneously, how many pages each chunk should have. Default vaules will be used if configs are not provided.
+[scanner_config.yaml](./scanner_config.yaml) and [target.yaml](./target.yaml) are symbolic linked files of [scanner_config.yaml](../../scanner_config.yaml) and [target.yaml](../../target.yaml) in the root folder of the repo. 
 
-You should adjust them accordingly, depends on how many pages you have and how much resource you want to spend on the cloud function.
-```yaml
-title: Sentry Cookie Scanner
-scanner:
-  headless: false
-  numPages: 0
-  captureHar: false
-  saveScreenshots: false
-  emulateDevice:
-    viewport:
-      height: 1920
-      width: 1080
-    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"
-
-# Note: pubsub message expires after 10 minutes, so we want to keep each chunk under 10 minutes
-maxConcurrent: 40 # number of concurrent scans
-chunkSize: 120 # number of pages to scan per chunk
-```
-
-[target.yaml](./target.yaml) is a yaml that include sitemaps, rss feeds, or pages that you want to scan. 
-
-```yaml
-sitemaps:
-  - https://sentry.io/sitemap/sitemap-0.xml
-  - https://blog.sentry.io/sitemap/sitemap-0.xml
-rss:
-  - https://sentry.io/changelog/feed.xml
-pages:
-  - https://status.sentry.io
-  - https://fsl.software
-```
+These will be the input for this function, for more details reference the [README.md](../../README.md) on the root folder.
 
 ## Output
 An example input that will be send from pub/sub, which will then trigger the [cookie-scanner](../cookie-scanner/) cloud function.
