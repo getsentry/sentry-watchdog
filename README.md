@@ -5,7 +5,7 @@ Sentry took a stand of removing all 3rd party cookeis and trackers from our publ
 - [Removing ad trackers and cookies - the technical perspective - Jeffrey Hung](https://blog.sentry.io/removing-ad-trackers-and-cookies-the-technical-perspective/)
 - [Sentry Cookie Bounty](https://sentry.io/cookiebounty/)
 
-Watchdog is a tool that we use to help us achieve the goal, it's a tool we use to scan for cookies and trackers on our public sites. Watchdog  built on top of [blacklight-collector from the Markup](https://github.com/the-markup/blacklight-collector/tree/main?tab=readme-ov-file). For more information about the `blacklight-collector` please read [their blog](https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector).
+Watchdog is a tool that we use to help us achieve the goal, which scans for cookies and trackers on our public sites on a weekly basis. Watchdog is built on top of [blacklight-collector from the Markup](https://github.com/the-markup/blacklight-collector/tree/main?tab=readme-ov-file). For more information about the `blacklight-collector` please read [their blog](https://themarkup.org/blacklight/2020/09/22/how-we-built-a-real-time-privacy-inspector).
 
 ## Configs
 
