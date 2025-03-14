@@ -165,6 +165,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         // Decode message
         const data = rawMessage.body.message.data ? Buffer.from(rawMessage.body.message.data, 'base64').toString() : '{}';
         const parsedData = JSON.parse(data);
+        const job_id = `${folderName} - [${parsedData.chunk_no}/${parsedData.total_chunks}]`
         console.log("--------------------------------")
         console.log(parsedData.title, " chunk_no: ", parsedData.chunk_no, " of ", parsedData.total_chunks);
         console.log("--------------------------------")
@@ -173,8 +174,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
             "message": "scanner started",
             "timestamp": new Date().toISOString(),
             "data": {
-                "chunk_no": parsedData.chunk_no,
-                "total_chunks": parsedData.total_chunks,
+                "job_id": job_id,
                 "total_pages": parsedData.total_pages
             }
         })
@@ -198,7 +198,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                 reportDir: 'reports'
             }
         };
-        const job_id = `[${parsedData.chunk_no}/${parsedData.total_chunks}]`
+        
 
         let pagesToScan: string[] = parsedData.target;
         let running = 0;
@@ -236,8 +236,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                         //     "message": `First scan failed`,
                         //     "timestamp": new Date().toISOString(),
                         //     "data": {
-                        //         "chunk_no": parsedData.chunk_no,
-                        //         "total_chunks": parsedData.total_chunks,
+                        //         "job_id": job_id,
                         //         "page_url": `${page}`
                         //     }
                         // });
@@ -253,8 +252,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                                 "message": `Retry scan failed`,
                                 "timestamp": new Date().toISOString(),
                                 "data": {
-                                    "chunk_no": parsedData.chunk_no,
-                                    "total_chunks": parsedData.total_chunks,
+                                    "job_id": job_id,
                                     "page_url": `${page}`
                                 }
                             });
@@ -289,8 +287,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
             "message": "chunk scan completed",
             "timestamp": new Date().toISOString(),
             "data": {
-                "chunk_no": parsedData.chunk_no,
-                "total_chunks": parsedData.total_chunks,
+                "job_id": job_id,
                 "report_url": `https://storage.googleapis.com/${bucketName}/${folderName}${parsedData.chunk_no}.json`,
                 "time_spent": `${((Date.now() - startTime) / 1000).toFixed(2)}s`
             }
