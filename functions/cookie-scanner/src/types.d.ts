@@ -121,3 +121,9 @@ export interface CollectorOptions {
     outDir?: string;
     reportDir?: string;
 }
+export interface LogFormat {
+    status: 'info' | 'error';
+    message: string;
+    timestamp: string;
+    data: Record<string, any>;
+}
