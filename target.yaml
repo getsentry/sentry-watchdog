@@ -1,0 +1,16 @@
+sitemaps:
+  - https://sentry.io/sitemap/sitemap-0.xml
+  - https://blog.sentry.io/sitemap/sitemap-0.xml
+  - https://answers.sentry.dev/sitemap/sitemap-0.xml
+  - https://sentry.zendesk.com/hc/sitemap.xml
+  - https://sentry.engineering/sitemap.xml
+  - https://sentry.design/sitemap-0.xml
+  - https://open.sentry.io/sitemap/sitemap-0.xml
+rss:
+  - https://sentry.io/changelog/feed.xml
+pages:
+  - https://sentry.io/auth/login/
+  - https://status.sentry.io
+  - https://fsl.software
+  # this link wasn't included in rss_feed, including it manually
+  - https://sentry.io/changelog

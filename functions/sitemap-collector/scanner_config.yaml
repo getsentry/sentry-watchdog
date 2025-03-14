@@ -1,14 +1,1 @@
-title: Sentry Cookie Scanner
-scanner:
-  headless: false
-  numPages: 0
-  captureHar: false
-  saveScreenshots: false
-  emulateDevice:
-    viewport:
-      height: 1920
-      width: 1080
-    userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"
-
-maxConcurrent: 40 # number of concurrent scans
-chunkSize: 120 # number of pages to scan per chunk
+../../scanner_config.yaml
