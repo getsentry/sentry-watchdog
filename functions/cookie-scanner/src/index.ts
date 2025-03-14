@@ -69,18 +69,24 @@ async function scanUrl(url: string, config: ScannerConfig): Promise<void> {
     const result = await collect(formattedUrl, scannerConfig);
 
     if (result.status === 'success') {
-        // These are too noise for logs, disable for now
+        // These are too noisy for logs, disable for now
         // logForwarding({
         //     "status": "info",
-        //     "message": `page scanned: ${url}`,
+        //     "message": `page scanned successfully`,
         //     "timestamp": new Date().toISOString(),
+        //     "data": {
+        //         "page_url": `${url}`
+        //     }
         // })
     } else {
-        // These are too noise for logs, disable for now
+        // These are too noisy for logs, disable for now
         // logForwarding({
         //     "status": "info",
-        //     "message": `page scanned: ${url}`,
+        //     "message": `page scanned successfully`,
         //     "timestamp": new Date().toISOString(),
+        //     "data": {
+        //         "page_url": `${url}`
+        //     }
         // })
     }
 }
@@ -227,7 +233,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                         // Sentry.captureMessage(`First scan attempt failed for ${page}:`, error);
                         // logForwarding({
                         //     "status": "info",
-                        //     "message": `$First scan failed`,
+                        //     "message": `First scan failed`,
                         //     "timestamp": new Date().toISOString(),
                         //     "data": {
                         //         "chunk_no": parsedData.chunk_no,
