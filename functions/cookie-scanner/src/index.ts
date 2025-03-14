@@ -3,7 +3,7 @@ import { Storage } from "@google-cloud/storage";
 import { join } from 'path';
 import { collect, CollectorOptions } from './collector';
 import { aggregateReports } from './aggregateReports';
-import { ScannerConfig } from './types';
+import { ScannerConfig, LogFormat } from './types';
 import * as fs from 'fs';
 import * as os from 'os';
 import axios from "axios";
@@ -21,12 +21,6 @@ Sentry.init({
 
 const LOG_DESTINATION = process.env.LOG_DESTINATION;
 const LOG_FORWARDING_AUTH_TOKEN = process.env.LOG_FORWARDING_AUTH_TOKEN;
-const LOG_FORMAT = { //Represents the required fields for the log parsing schema
-    status: "",
-    message: "",
-    timestamp: new Date().toISOString(),
-    data: {}
-};
 
 async function scanUrl(url: string, config: ScannerConfig): Promise<void> {
     const scannerConfig: CollectorOptions = {
@@ -98,7 +92,7 @@ async function scanUrl(url: string, config: ScannerConfig): Promise<void> {
 }
 
 // Forward logs to SIEM webhook
-async function logForwarding(data: Record<string, any>): Promise<void> {
+async function logForwarding(data: LogFormat): Promise<void> {
     if (LOG_DESTINATION && LOG_FORWARDING_AUTH_TOKEN) {
         const headers = {
             "Authorization": `Bearer ${LOG_FORWARDING_AUTH_TOKEN}`,
