@@ -3,7 +3,7 @@ import { Storage } from "@google-cloud/storage";
 import { join } from 'path';
 import { collect, CollectorOptions } from './collector';
 import { aggregateReports } from './aggregateReports';
-import { ScannerConfig } from './types';
+import { ScannerConfig, LogFormat } from './types';
 import * as fs from 'fs';
 import * as os from 'os';
 import axios from "axios";
@@ -69,24 +69,30 @@ async function scanUrl(url: string, config: ScannerConfig): Promise<void> {
     const result = await collect(formattedUrl, scannerConfig);
 
     if (result.status === 'success') {
-        // These are too noise for logs, disable for now
+        // These are too noisy for logs, disable for now
         // logForwarding({
         //     "status": "info",
-        //     "message": `page scanned: ${url}`,
+        //     "message": `page scanned successfully`,
         //     "timestamp": new Date().toISOString(),
+        //     "data": {
+        //         "page_url": `${url}`
+        //     }
         // })
     } else {
-        // These are too noise for logs, disable for now
+        // These are too noisy for logs, disable for now
         // logForwarding({
         //     "status": "info",
-        //     "message": `page scanned: ${url}`,
+        //     "message": `page scanned successfully`,
         //     "timestamp": new Date().toISOString(),
+        //     "data": {
+        //         "page_url": `${url}`
+        //     }
         // })
     }
 }
 
 // Forward logs to SIEM webhook
-async function logForwarding(data: Record<string, any>): Promise<void> {
+async function logForwarding(data: LogFormat): Promise<void> {
     if (LOG_DESTINATION && LOG_FORWARDING_AUTH_TOKEN) {
         const headers = {
             "Authorization": `Bearer ${LOG_FORWARDING_AUTH_TOKEN}`,
@@ -159,6 +165,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         // Decode message
         const data = rawMessage.body.message.data ? Buffer.from(rawMessage.body.message.data, 'base64').toString() : '{}';
         const parsedData = JSON.parse(data);
+        const job_id = `${folderName} - [${parsedData.chunk_no}/${parsedData.total_chunks}]`
         console.log("--------------------------------")
         console.log(parsedData.title, " chunk_no: ", parsedData.chunk_no, " of ", parsedData.total_chunks);
         console.log("--------------------------------")
@@ -167,8 +174,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
             "message": "scanner started",
             "timestamp": new Date().toISOString(),
             "data": {
-                "chunk_no": parsedData.chunk_no,
-                "total_chunks": parsedData.total_chunks,
+                "job_id": job_id,
                 "total_pages": parsedData.total_pages
             }
         })
@@ -192,7 +198,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                 reportDir: 'reports'
             }
         };
-        const job_id = `[${parsedData.chunk_no}/${parsedData.total_chunks}]`
+        
 
         let pagesToScan: string[] = parsedData.target;
         let running = 0;
@@ -227,8 +233,12 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                         // Sentry.captureMessage(`First scan attempt failed for ${page}:`, error);
                         // logForwarding({
                         //     "status": "info",
-                        //     "message": `${job_id} First scan failed for ${page}`,
+                        //     "message": `First scan failed`,
                         //     "timestamp": new Date().toISOString(),
+                        //     "data": {
+                        //         "job_id": job_id,
+                        //         "page_url": `${page}`
+                        //     }
                         // });
                         // if failed, try again
                         try {
@@ -239,8 +249,12 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                             console.error(`${job_id} Retry scan failed for ${page}:`, retryError);
                             logForwarding({
                                 "status": "info",
-                                "message": `Retry scan failed for ${page}`,
+                                "message": `Retry scan failed`,
                                 "timestamp": new Date().toISOString(),
+                                "data": {
+                                    "job_id": job_id,
+                                    "page_url": `${page}`
+                                }
                             });
                             failedPages.push(page);
                         }
@@ -273,8 +287,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
             "message": "chunk scan completed",
             "timestamp": new Date().toISOString(),
             "data": {
-                "chunk_no": parsedData.chunk_no,
-                "total_chunks": parsedData.total_chunks,
+                "job_id": job_id,
                 "report_url": `https://storage.googleapis.com/${bucketName}/${folderName}${parsedData.chunk_no}.json`,
                 "time_spent": `${((Date.now() - startTime) / 1000).toFixed(2)}s`
             }
