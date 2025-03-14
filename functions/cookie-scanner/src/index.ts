@@ -227,8 +227,13 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                         // Sentry.captureMessage(`First scan attempt failed for ${page}:`, error);
                         // logForwarding({
                         //     "status": "info",
-                        //     "message": `${job_id} First scan failed for ${page}`,
+                        //     "message": `$First scan failed`,
                         //     "timestamp": new Date().toISOString(),
+                        //     "data": {
+                        //         "chunk_no": parsedData.chunk_no,
+                        //         "total_chunks": parsedData.total_chunks,
+                        //         "page_url": `${page}`
+                        //     }
                         // });
                         // if failed, try again
                         try {
@@ -239,8 +244,13 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                             console.error(`${job_id} Retry scan failed for ${page}:`, retryError);
                             logForwarding({
                                 "status": "info",
-                                "message": `Retry scan failed for ${page}`,
+                                "message": `Retry scan failed`,
                                 "timestamp": new Date().toISOString(),
+                                "data": {
+                                    "chunk_no": parsedData.chunk_no,
+                                    "total_chunks": parsedData.total_chunks,
+                                    "page_url": `${page}`
+                                }
                             });
                             failedPages.push(page);
                         }
