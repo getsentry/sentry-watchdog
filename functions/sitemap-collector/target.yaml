@@ -14,3 +14,6 @@ pages:
   - https://fsl.software
   # this link wasn't included in rss_feed, including it manually
   - https://sentry.io/changelog
+exclude:
+  # sentry.io redirects to sentry.io/welcome/ which is included in sitemap, remove it to prevent redirect error
+  - https://sentry.io/

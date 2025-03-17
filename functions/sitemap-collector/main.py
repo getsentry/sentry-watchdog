@@ -75,6 +75,10 @@ def get_pages_from_feed(feeds):
     return pages_to_scan
 
 
+def exclude_pages_from_list(pages_to_scan, exclude_list):
+    return [page for page in pages_to_scan if page not in exclude_list]
+
+
 def get_publisher_callback(
     PUBLISH_FUTURES: pubsub_v1.publisher.futures.Future, data: str
 ) -> Callable[[pubsub_v1.publisher.futures.Future], None]:
@@ -100,6 +104,9 @@ def main(request):
     pages_to_scan = get_pages_from_site(target["sitemaps"])
     pages_to_scan.extend(get_pages_from_feed(target["rss"]))
     pages_to_scan.extend(target["pages"])
+
+    # exclude pages from the list
+    pages_to_scan = exclude_pages_from_list(pages_to_scan, target["exclude"])
 
     # print the list of pages to scan
     page_count = len(pages_to_scan)
