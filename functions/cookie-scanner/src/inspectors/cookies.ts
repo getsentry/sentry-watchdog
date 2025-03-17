@@ -96,15 +96,6 @@ export const getJsCookies = (events, url) => {
                 typeof event.data.value !== 'undefined' &&
                 typeof Cookie.parse(event.data.value) !== 'undefined'
         )
-<<<<<<<< HEAD:functions/cookie-scanner/src/cookie-collector.ts
-        .map(d => {
-            const data = parseCookie(d.data.value, url);
-            const hasOwnDomain = hasOwnProperty(d, 'domain') && d.domain !== null && d.domain !== undefined;
-            const hasOwnName = data && hasOwnProperty(data, 'key') && data.key !== null && data.key !== undefined;
-            const hasOwnPath = data && hasOwnProperty(data, 'path') && data.path !== null && data.path !== undefined;
-            const hasOwnValue = data && hasOwnProperty(data, 'value') && data.value !== null && data.value !== undefined;
-            const script = getScriptUrl(d);
-========
         .map(event => {
             const data         = parseCookie(event.data.value, url);
             const hasOwnDomain = hasOwnProperty(event, 'domain') && 
@@ -123,7 +114,6 @@ export const getJsCookies = (events, url) => {
                                  data.value !== null && 
                                  data.value !== undefined;
             const script       = getScriptUrl(event);
->>>>>>>> upstream/main:functions/cookie-scanner/src/inspectors/cookies.ts
 
             return {
                 domain: hasOwnDomain ? event.domain : getDomain(url),

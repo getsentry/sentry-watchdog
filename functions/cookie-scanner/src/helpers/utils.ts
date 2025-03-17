@@ -2,6 +2,7 @@ import crypto from 'crypto';
 import fs from 'fs';
 import { join } from 'path';
 import { BlacklightEvent } from '../types';
+import { Browser } from 'puppeteer';
 
 export const hasOwnProperty = (object:object, property:string) => {
     return Object.prototype.hasOwnProperty.call(object, property);
