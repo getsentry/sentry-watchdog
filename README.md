@@ -11,6 +11,7 @@ Watchdog is a tool that we use to help us achieve the goal, which scans for cook
 
 ## Configs
 
+### Scanner Config
 Scanner related configureation are defined in [scanner_config.yaml](./scanner_config.yaml) file, it will decide how scanner will scan your page, you can find a list of all the [available configurations here](https://github.com/the-markup/blacklight-collector/tree/main?tab=readme-ov-file#collector-configuration) for scanner related options. You can also control how many pages you want to scan simultaneously, how many pages each chunk should have. Default vaules will be used if configs are not provided.
 
 You should adjust them accordingly, depends on how many pages you have and how much resource you want to spend on the cloud function.
@@ -31,7 +32,7 @@ scanner:
 maxConcurrent: 40 # number of concurrent scans
 chunkSize: 120 # number of pages to scan per chunk
 ```
-
+### Target pages
 [target.yaml](./target.yaml) is where you define the pages you want to scan, it can include sitemaps, rss feeds, or individual pages. 
 ```yaml
 sitemaps:
@@ -41,6 +42,28 @@ rss:
 pages:
   - https://status.sentry.io
 ```
+### Known Cookies
+[known_cookies.json](./known_cookies.json) is where we define what we considered as known cookies. Any cookie(s) or tracker(s) in the list is consided as authorized and will not be triggering any alert. The URL list under each cookie item doesn't matter, it's just a snapshot of the URLs that has that cookie when the json file is generated.
+
+```json
+{
+  "cookies":{
+    "cookie_name/domain":[
+      "page1.com",
+      "page2.com"
+    ]
+  },
+  "third_party_trackers":{
+    "tracker_1":[
+      "page1.com"
+    ],
+    "tracker_2":[
+      "page2.com"
+    ]
+  }
+}
+```
+
 
 ## Infrastructure
 The infrastructure is build using the template from [secure-cloud-function-template](https://github.com/getsentry/secure-cloud-functions-template) using terraform.
@@ -57,7 +80,7 @@ Besides cloud functions, terraform also creates [Pub/Sub Subscription and topic]
 graph TD
 		A(Weekly Cron Job) --> P
 		P[Cloud Function - Sitemap-collector] --> B
-    B[Collect pages from `target.yaml`]--> C
+    B[Collect pages from target.yaml]--> C
     C[Break into chunks and send to PubSub] 
     
     C --> E1@{ shape: cyl, label: "PubSub message 1"}
