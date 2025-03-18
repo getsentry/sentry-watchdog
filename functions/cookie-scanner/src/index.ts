@@ -73,7 +73,7 @@ async function scanUrl(url: string, config: ScannerConfig): Promise<void> {
         // logForwarding({
         //     "status": "info",
         //     "message": `page scanned successfully`,
-        //     "timestamp": new Date().toISOString(),
+        //     "timestamp": getRFC3339Date(),
         //     "data": {
         //         "page_url": `${url}`
         //     }
@@ -83,13 +83,21 @@ async function scanUrl(url: string, config: ScannerConfig): Promise<void> {
         // logForwarding({
         //     "status": "info",
         //     "message": `page scanned successfully`,
-        //     "timestamp": new Date().toISOString(),
+        //     "timestamp": getRFC3339Date(),
         //     "data": {
         //         "page_url": `${url}`
         //     }
         // })
     }
 }
+
+function getRFC3339Date(): string {
+    const date = new Date().toISOString();; // "2024-03-18T12:34:56.789Z"
+    // Convert "Z" to "+00:00" for strict RFC 3339 compliance
+    return date.replace("Z", "+00:00");
+}
+
+
 
 // Forward logs to SIEM webhook
 async function logForwarding(data: LogFormat): Promise<void> {
@@ -114,7 +122,7 @@ async function logForwarding(data: LogFormat): Promise<void> {
 }
 
 const bucketName = process.env.AGGREGATE_REPORTS_BUCKET;
-const today = new Date().toISOString().slice(0, 10).replace(/-/g, ""); // Format: YYYYMMDD
+const today = getRFC3339Date().slice(0, 10).replace(/-/g, ""); // Format: YYYYMMDD
 const folderName = `${today}/`; // Folder with today's date
 
 async function uploadReportToGCS(file_name: string, report: string, bucketName: string, folderName: string) {
@@ -172,7 +180,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         logForwarding({
             "status": "info",
             "message": "scanner started",
-            "timestamp": new Date().toISOString(),
+            "timestamp": getRFC3339Date(),
             "data": {
                 "job_id": job_id,
                 "total_pages": parsedData.total_pages
@@ -234,7 +242,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                         // logForwarding({
                         //     "status": "info",
                         //     "message": `First scan failed`,
-                        //     "timestamp": new Date().toISOString(),
+                        //     "timestamp": getRFC3339Date(),
                         //     "data": {
                         //         "job_id": job_id,
                         //         "page_url": `${page}`
@@ -250,7 +258,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                             logForwarding({
                                 "status": "info",
                                 "message": `Retry scan failed`,
-                                "timestamp": new Date().toISOString(),
+                                "timestamp": getRFC3339Date(),
                                 "data": {
                                     "job_id": job_id,
                                     "page_url": `${page}`
@@ -285,7 +293,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         logForwarding({
             "status": "info",
             "message": "chunk scan completed",
-            "timestamp": new Date().toISOString(),
+            "timestamp": getRFC3339Date(),
             "data": {
                 "job_id": job_id,
                 "report_url": `https://storage.googleapis.com/${bucketName}/${folderName}${parsedData.chunk_no}.json`,
@@ -297,7 +305,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
             logForwarding({
                 "status": "error",
                 "message": "failed pages",
-                "timestamp": new Date().toISOString(),
+                "timestamp": getRFC3339Date(),
                 "data": {
                     "job_id": job_id,
                     "failed_pages": failedPages
@@ -319,7 +327,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         logForwarding({
             "status": "error",
             "message": "scanner failed",
-            "timestamp": new Date().toISOString(),
+            "timestamp": getRFC3339Date(),
             "data": error.message
         });
         Sentry.captureException(error);
