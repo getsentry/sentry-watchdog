@@ -10,7 +10,8 @@
     "test-server": "node ./config/test-server.js",
     "fix": "run-s fix:*",
     "fix:prettier": "prettier \"src/**/*.ts\" --write",
-    "fix:tslint": "tslint -t verbose --fix --project ."
+    "fix:tslint": "tslint -t verbose --fix --project .",
+    "local_test": "ts-node src/local_test.ts"
   },
   "repository": {
     "type": "git",
