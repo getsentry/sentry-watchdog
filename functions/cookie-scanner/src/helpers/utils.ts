@@ -40,7 +40,15 @@ export const closeBrowser = async (browser: Browser) => {
         }));
 
         // Then close the browser with a timeout
-        const browserClosePromise = browser.close();
+        const browserClosePromise = (async () => {
+            try {
+                await browser.disconnect();
+                await browser.close();
+            } catch (e) {
+                throw e;
+            }
+        })();
+
         const timeoutPromise = new Promise((_, reject) => 
             setTimeout(() => reject(new Error('Browser close timeout')), 30000)
         );
@@ -51,14 +59,17 @@ export const closeBrowser = async (browser: Browser) => {
                 console.error('Browser close failed:', error);
                 // If normal close fails, try force closing the browser process
                 try {
-                    browser.process()?.kill('SIGKILL');
+                    // Force kill the browser process
+                    const process = browser.process();
+                    if (process) {
+                        process.kill('SIGKILL');
+                    }
                 } catch (killError) {
                     // If even force kill fails, log it but don't throw
                     console.error('Failed to force kill browser:', killError);
                 }
             });
     } catch (error) {
-        // Log error but don't throw to ensure cleanup continues
         console.error('Error during browser cleanup:', error);
     }
 };
