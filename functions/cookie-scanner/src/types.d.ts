@@ -41,7 +41,7 @@ export interface TrackingRequestEvent {
         listName: string;
     };
 }
-export interface BlacklightErrorEvent {
+interface BlacklightErrorEvent {
     type: 'Error' | 'Error.BlacklightInspector' | 'Error.KeyLogging' | 'Error.JsInstrument';
     url: string;
     stack: any[];
@@ -57,24 +57,6 @@ export interface LinkObject {
     innerHtml: string;
     innerText: string;
 }
-export declare const SESSION_RECORDERS_LIST: string[];
-export declare const BEHAVIOUR_TRACKING_EVENTS: {
-    KEYBOARD: string[];
-    MOUSE: string[];
-    SENSOR: string[];
-    TOUCH: string[];
-};
-export declare const FINGERPRINTABLE_WINDOW_APIS: {
-    AUDIO: string[];
-    BATTERY: string[];
-    CANVAS: string[];
-    MEDIA_DEVICES: string[];
-    MIME: string[];
-    NAVIGATOR: string[];
-    PLUGIN: string[];
-    SCREEN: string[];
-    WEBRTC: string[];
-};
 export interface ScannerConfig {
     title: string;
     scanner: {
@@ -127,3 +109,7 @@ export interface LogFormat {
     timestamp: string;
     data: Record<string, any>;
 }
+type ScriptUrl = string;
+type CanvasCallValue = string;
+export type CanvasCallMap = Map<ScriptUrl, Set<CanvasCallValue>>;
+export {};

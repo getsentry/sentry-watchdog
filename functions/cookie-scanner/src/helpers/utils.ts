@@ -1,11 +1,10 @@
 import crypto from 'crypto';
 import fs from 'fs';
 import { join } from 'path';
-import { getDomain } from 'tldts';
-import { BlacklightEvent } from './types';
+import { BlacklightEvent } from '../types';
 import { Browser } from 'puppeteer';
 
-export const hasOwnProperty = (object: object, property: string) => {
+export const hasOwnProperty = (object:object, property:string) => {
     return Object.prototype.hasOwnProperty.call(object, property);
 };
 
@@ -73,7 +72,7 @@ export const clearDir = (outDir, mkNewDir = true) => {
     }
 };
 
-export const loadJSONSafely = str => {
+export const loadJSONSafely = (str:string) => {
     try {
         return JSON.parse(str);
     } catch (error) {
@@ -81,6 +80,7 @@ export const loadJSONSafely = str => {
         return { level: 'error' };
     }
 };
+
 export const groupBy = key => array =>
     array.reduce((objectsByKeyValue, obj) => {
         const value = obj[key];
@@ -124,30 +124,7 @@ export const loadEventData = (dir, filename = 'inspection-log.ndjson') => {
         .filter(m => m.level === 'warn');
 };
 
-// Not using this atm but leaving it in because it might be useful in the future
-export const getStackType = (stack, firstPartyDomain) => {
-    let hasFirstParty = false;
-    let hasThirdParty = false;
-    stack.forEach(s => {
-        if (hasOwnProperty(s, 'fileName')) {
-            const scriptDomain = getDomain(s.fileName);
-            if (scriptDomain === firstPartyDomain) {
-                hasFirstParty = true;
-            } else {
-                hasThirdParty = true;
-            }
-        }
-    });
-    if (hasFirstParty && !hasThirdParty) {
-        return 'first-party-only';
-    } else if (hasThirdParty && !hasFirstParty) {
-        return 'third-party-only';
-    } else {
-        return 'mixed';
-    }
-};
-
-export const getStringHash = (algorithm, str) => {
+const getStringHash = (algorithm, str) => {
     return crypto.createHash(algorithm).update(str).digest('hex');
 };
 

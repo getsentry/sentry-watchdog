@@ -8,4 +8,3 @@ export declare const defaultPuppeteerBrowserOptions: {
     defaultViewport: any;
     headless: boolean;
 };
-export declare const SOCIAL_URLS: string[];
