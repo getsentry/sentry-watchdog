@@ -1,5 +1,5 @@
 # Sentry Watchdog
-<img src="sentry_watchdog.png" alt="sentry_watchdog" width="200"/>
+<img src="img/sentry_watchdog.png" alt="sentry_watchdog" width="200"/>
 
 Sentry took a stand of removing all 3rd party cookeis and trackers from our public websites in 2024.
 - [We removed advertising cookies and here’s what happened - Matt Henderson](https://blog.sentry.io/we-removed-advertising-cookies-heres-what-happened/)
@@ -76,37 +76,7 @@ Watchdog contains 3 cloud functions, each has their own readme file with more de
 Besides cloud functions, terraform also creates [Pub/Sub Subscription and topic](./pubsubs/page-scanning-pubsub/) and a [GCS bucket](./gcs/aggregated_reports_storage/) for triggering events and storing reports.
 
 ### Flow
-```mermaid
-graph TD
-		A(Weekly Cron Job) --> P
-		P[Cloud Function - Sitemap-collector] --> B
-    B[Collect pages from target.yaml]--> C
-    C[Break into chunks and send to PubSub] 
-    
-    C --> E1@{ shape: cyl, label: "PubSub message 1"}
-    C --> E2@{ shape: cyl, label: "PubSub message 2"}
-		C --> E3@{ shape: cyl, label: "PubSub message N"}
-		
-    E1 --> Q1(PubSub trigger) -->F1[Cloud Function: cookie-scanner #1]
-    E2 --> Q2(PubSub trigger) -->F2[Cloud Function: cookie-scanner #2]
-    E3 --> Q3(PubSub trigger) -->F3[Cloud Function: cookie-scanner #N]
-
-    F1 -->H1
-    F2 -->H2
-    F3 -->H3
-
-    H1(Save report to GCS) -->I@{ shape: cyl, label: "GCS Bucket"}
-    H2(Save report to GCS) -->I
-    H3(Save report to GCS) -->I
-
-    A --> | +2 hours| K
-    I -.->K
-    K[Grab all reports from GCS] -->L
-    L[Aggregate reports] -->M
-    M[Compare with Known Cookie List] -->N
-    N[Raise alert if unknown cookies found]
-
-```
+![infrastrucre_diagram](img/sentry_watchdog_infra.png)
 
 ## Deployement
 
