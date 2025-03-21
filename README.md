@@ -12,7 +12,7 @@ Watchdog is a tool that we use to help us achieve the goal, which scans for cook
 ## Configs
 
 ### Scanner Config
-Scanner related configureation are defined in [scanner_config.yaml](./scanner_config.yaml) file, it will decide how scanner will scan your page, you can find a list of all the [available configurations here](https://github.com/the-markup/blacklight-collector/tree/main?tab=readme-ov-file#collector-configuration) for scanner related options. You can also control how many pages you want to scan simultaneously, how many pages each chunk should have. Default vaules will be used if configs are not provided.
+Scanner-related configurations are defined in [scanner_config.yaml](./scanner_config.yaml), which determines how the scanner will scan your page. You can find a list of all the [available configurations here](https://github.com/the-markup/blacklight-collector/tree/main?tab=readme-ov-file#collector-configuration) for scanner-related options. You can also control how many pages you want to scan simultaneously and how many pages each chunk should have. Default vaules will be used if configs are not provided.
 
 You should adjust them accordingly, depends on how many pages you have and how much resource you want to spend on the cloud function.
 ```yaml
