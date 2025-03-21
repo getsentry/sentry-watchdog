@@ -1,7 +1,7 @@
 # Sentry Watchdog
 <img src="img/sentry_watchdog.png" alt="sentry_watchdog" width="200"/>
 
-Sentry took a stand of removing all 3rd party cookeis and trackers from our public websites in 2024.
+Sentry took a stand of removing all 3rd party cookies and trackers from our public websites in 2024.
 - [We removed advertising cookies and here’s what happened - Matt Henderson](https://blog.sentry.io/we-removed-advertising-cookies-heres-what-happened/)
 - [Navigating Cookies at Sentry: A Legal Perspective - Loretta Lau](https://blog.sentry.io/navigating-cookies-at-sentry-a-legal-perspective/)
 - [Removing ad trackers and cookies - the technical perspective - Jeffrey Hung](https://blog.sentry.io/removing-ad-trackers-and-cookies-the-technical-perspective/)
