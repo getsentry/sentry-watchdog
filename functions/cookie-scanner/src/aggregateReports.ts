@@ -57,9 +57,7 @@ export async function aggregateReports(customConfig: ScannerConfig): Promise<str
                     if (cookie.name && cookie.domain) {
                         const cookieKey = `${cookie.name}/${cookie.domain}`;
 
-                        if (!aggregatedReport.cookies[cookieKey]) {
-                            aggregatedReport.cookies[cookieKey] = [];
-                        }
+                        aggregatedReport.cookies[cookieKey] ||= [];
 
                         // Only add URL if it's not already in the list
                         if (!aggregatedReport.cookies[cookieKey].includes(url)) {
@@ -75,9 +73,7 @@ export async function aggregateReports(customConfig: ScannerConfig): Promise<str
                     if (event.name && event.domain) {
                         const eventKey = `${event.name}/${event.domain}`;
 
-                        if (!aggregatedReport.fb_pixel_events[eventKey]) {
-                            aggregatedReport.fb_pixel_events[eventKey] = [];
-                        }
+                        aggregatedReport.fb_pixel_events[eventKey] ||= [];
 
                         if (!aggregatedReport.fb_pixel_events[eventKey].includes(url)) {
                             aggregatedReport.fb_pixel_events[eventKey].push(url);
@@ -92,9 +88,7 @@ export async function aggregateReports(customConfig: ScannerConfig): Promise<str
                     if (logging.name && logging.domain) {
                         const loggingKey = `${logging.name}/${logging.domain}`;
 
-                        if (!aggregatedReport.key_logging[loggingKey]) {
-                            aggregatedReport.key_logging[loggingKey] = [];
-                        }
+                        aggregatedReport.key_logging[loggingKey] ||= [];
 
                         if (!aggregatedReport.key_logging[loggingKey].includes(url)) {
                             aggregatedReport.key_logging[loggingKey].push(url);
@@ -109,9 +103,7 @@ export async function aggregateReports(customConfig: ScannerConfig): Promise<str
                     if (recorder.name && recorder.domain) {
                         const recorderKey = `${recorder.name}/${recorder.domain}`;
 
-                        if (!aggregatedReport.session_recorders[recorderKey]) {
-                            aggregatedReport.session_recorders[recorderKey] = [];
-                        }
+                        aggregatedReport.session_recorders[recorderKey] ||= [];
 
                         if (!aggregatedReport.session_recorders[recorderKey].includes(url)) {
                             aggregatedReport.session_recorders[recorderKey].push(url);
@@ -123,9 +115,7 @@ export async function aggregateReports(customConfig: ScannerConfig): Promise<str
             // Process third_party_trackers from the report
             if (report.reports.third_party_trackers && Array.isArray(report.reports.third_party_trackers)) {
                 for (const tracker of report.reports.third_party_trackers) {
-                    if (!aggregatedReport.third_party_trackers[tracker.data.filter]) {
-                        aggregatedReport.third_party_trackers[tracker.data.filter] = [];
-                    }
+                    aggregatedReport.third_party_trackers[tracker.data.filter] ||= [];
 
                     if (!aggregatedReport.third_party_trackers[tracker.data.filter].includes(url)) {
                         aggregatedReport.third_party_trackers[tracker.data.filter].push(url);
