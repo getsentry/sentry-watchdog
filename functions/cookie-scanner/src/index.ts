@@ -8,7 +8,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import axios from "axios";
 
-import * as Sentry from "@sentry/node";
+import * as Sentry from "@sentry/google-cloud-serverless";
 
 export { collect, CollectorOptions } from './collector';
 export { aggregateReports } from './aggregateReports';
@@ -97,8 +97,6 @@ function getRFC3339Date(): string {
     return date.replace("Z", "+00:00");
 }
 
-
-
 // Forward logs to SIEM webhook
 async function logForwarding(data: LogFormat): Promise<void> {
     if (LOG_DESTINATION && LOG_FORWARDING_AUTH_TOKEN) {
@@ -148,32 +146,12 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
     const startTime = Date.now();
     const failedPages: string[] = [];
 
-    // Add deadline extension functionality
-    let isProcessing = true;
-    const extendDeadline = async () => {
-        while (isProcessing) {
-            try {
-                // Extend deadline every 8 minutes (480000ms)
-                // We do this before the 10-minute ACK deadline to ensure we don't miss it
-                await new Promise(resolve => setTimeout(resolve, 480000));
-                if (isProcessing) {
-                    // If still processing, extend deadline by sending a 102 Processing status
-                    res.writeProcessing();
-                }
-            } catch (error) {
-                Sentry.captureException(error);
-            }
-        }
-    };
-
     try {
-        // Start deadline extension in the background
-        extendDeadline();
-
-        // Decode message
-        const data = rawMessage.body.message.data ? Buffer.from(rawMessage.body.message.data, 'base64').toString() : '{}';
+        // Decode message and get necessary PubSub details
+        const message = rawMessage.body.message;
+        const data = message.data ? Buffer.from(message.data, 'base64').toString() : '{}';
         const parsedData = JSON.parse(data);
-        const job_id = `${today}[${parsedData.chunk_no}/${parsedData.total_chunks}]`
+        const job_id = `${today}[${parsedData.chunk_no}/${parsedData.total_chunks}]`;
         console.log("--------------------------------")
         console.log(parsedData.title, " chunk_no: ", parsedData.chunk_no, " of ", parsedData.total_chunks);
         console.log("--------------------------------")
@@ -237,18 +215,7 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                     try {
                         await scanUrl(page, customConfig);
                     } catch (error) {
-                        // These are too noise for logs, disable for now
-                        // Sentry.captureMessage(`First scan attempt failed for ${page}:`, error);
-                        // logForwarding({
-                        //     "status": "info",
-                        //     "message": `First scan failed`,
-                        //     "timestamp": getRFC3339Date(),
-                        //     "data": {
-                        //         "job_id": job_id,
-                        //         "page_url": `${page}`
-                        //     }
-                        // });
-                        // if failed, try again
+                        // failure are usually due to network issues, so try again
                         try {
                             console.log(`${job_id} Attempting retry scan for: ${page}`);
                             await scanUrl(page, customConfig);
@@ -282,9 +249,6 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
         // Wait for ALL scan promises to complete
         await Promise.allSettled(scanPromises);
 
-        // Stop the deadline extension
-        isProcessing = false;
-
         console.log(`${job_id} All scans completed, generating aggregate report`);
         const aggregatedReport = await aggregateReports(customConfig);
         const result = {metadata, result: aggregatedReport};
@@ -313,17 +277,13 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
             });
         }
 
-        // Explicitly ACK by returning 200
         res.status(200).json({
             success: true,
-            messageId: rawMessage.body.message.messageId,
+            messageId: message.messageId,
             report: aggregatedReport
         });
     } catch (error) {
-        // Stop the deadline extension
-        isProcessing = false;
-
-        // Explicitly NACK by returning 500
+        // Explicitly ACK by returning 500
         logForwarding({
             "status": "error",
             "message": "scanner failed",
