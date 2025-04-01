@@ -11,4 +11,4 @@ scanner:
     userAgent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"
 
 maxConcurrent: 20 # number of concurrent scans
-chunkSize: 80 # number of pages to scan per chunk
+chunkSize: 60 # number of pages to scan per chunk
