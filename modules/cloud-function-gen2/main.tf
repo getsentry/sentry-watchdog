@@ -106,6 +106,7 @@ resource "google_cloudfunctions2_function" "function" {
     service_account_email = google_service_account.function_sa.email
     ingress_settings      = var.ingress_settings
     environment_variables = var.environment_variables
+    max_instance_count    = var.max_instance_count
     dynamic "secret_environment_variables" {
       for_each = var.secret_environment_variables
       iterator = item

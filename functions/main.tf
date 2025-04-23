@@ -25,7 +25,7 @@ module "cloud_function_gen2" {
   available_cpu         = lookup(each.value.cloud-function-gen2, "available_cpu", null)
   allow_unauthenticated = lookup(each.value.cloud-function-gen2, "allow_unauthenticated", null)
   function_entrypoint   = lookup(each.value.cloud-function-gen2, "function_entrypoint", null)
-
+  max_instance_count    = lookup(each.value.cloud-function-gen2, "max_instance_count", null)
   # A hack to allow variables in yamls
   # This will check if value starts with $, and lookup the value from the local_variables map, which is created from terraform.tfvars
   environment_variables = {

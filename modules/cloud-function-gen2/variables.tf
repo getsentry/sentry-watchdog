@@ -140,3 +140,9 @@ variable "available_cpu" {
   default     = 2
   nullable    = false
 }
+
+variable "max_instance_count" {
+  description = "Maximum number of function instances that may coexist at a given time."
+  type        = number
+  default     = 100
+}
