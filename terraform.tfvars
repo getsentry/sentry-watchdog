@@ -9,5 +9,5 @@ owner = "team-security"
 # sentry-cookie-scanner project in sentry's sentry https://sentry.sentry.io/projects/sentry-cookie-scanner/
 sentry_dsn = "https://39d93e532415311821aaa75fbba3b851@o1.ingest.us.sentry.io/4508955969060864"
 # set the webhook url if you want to send logs to a webhook
-# manually add any auth for webhookif needed
-log_destination = "https://logs.sentry.runpanther.net/http/63741fbd-749a-44b0-b338-889f3da274c2"
+# manually add any auth for webhook if needed
+log_destination = "https://api.runreveal.com/sources/webhook/2w8C4ldut2UHRp8PgZK3DQ6fnCl"
