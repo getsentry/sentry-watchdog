@@ -141,6 +141,17 @@ async function uploadReportToGCS(file_name: string, report: string, bucketName: 
     }
 }
 
+interface Result {
+    metadata: {
+        title: string;
+        date: string;
+        chunk_no: string;
+        total_chunks: string;
+        total_pages: string;
+    };
+    result: string;
+    [key: string]: any; // Allows any additional string keys with any value type
+}
 
 export const main = functions.http('main', async (rawMessage: functions.Request, res: functions.Response) => {
     const startTime = Date.now();
@@ -251,8 +262,14 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
 
         console.log(`${job_id} All scans completed, generating aggregate report`);
         const aggregatedReport = await aggregateReports(customConfig);
-        const result = {metadata, result: aggregatedReport};
-        await uploadReportToGCS(parsedData.chunk_no, JSON.stringify(result), bucketName, folderName);
+        const report: Result = {
+            metadata: metadata,
+            result: aggregatedReport,
+            // only add failed_pages if there are any
+            ...(failedPages.length > 0 && { failed_pages: failedPages })
+        };
+
+        await uploadReportToGCS(parsedData.chunk_no, JSON.stringify(report), bucketName, folderName);
         
         logForwarding({
             "status": "info",
@@ -264,18 +281,6 @@ export const main = functions.http('main', async (rawMessage: functions.Request,
                 "time_spent": `${((Date.now() - startTime) / 1000).toFixed(2)}s`
             }
         });
-
-        if (failedPages.length > 0) {
-            logForwarding({
-                "status": "error",
-                "message": "failed pages",
-                "timestamp": getRFC3339Date(),
-                "data": {
-                    "job_id": job_id,
-                    "failed_pages": failedPages
-                }
-            });
-        }
 
         res.status(200).json({
             success: true,
