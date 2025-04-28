@@ -11,7 +11,7 @@ from collections import defaultdict
 AGGREGATE_REPORTS_BUCKET = "aggregated-reports-storage"
 
 # Update this to the date of the report you want to pull from GCS
-TARGET_FOLDER = "20250315"
+TARGET_FOLDER = "20250428"
 
 UNKNOWN_COOKIES_TEMPLATE = {
     "cookies": {},
@@ -37,22 +37,25 @@ def identify_unknow_cookies(known_cookies, cookie_found):
 def combine_reports(bucket_name):
     folder_name = TARGET_FOLDER
 
-    reports = retrieve_reports_from_bucket(bucket_name, folder_name)
+    reports, failed_pages = retrieve_reports_from_bucket(bucket_name, folder_name)
+
     reports = merge_dicts(reports)
+    # de-duplicate failed pages
+    failed_pages = list(dict.fromkeys(failed_pages))
+    
     # # save to file
     # with open("combined_reports.json", "w") as f:
-    #     json.dump(reports, f)
+    #     json.dump(failed_pages, f)
 
-    return reports
+    return reports, failed_pages
 
 
 def retrieve_reports_from_bucket(bucket_name, folder_name):
     client = storage.Client()
     bucket = client.bucket(bucket_name)
     blobs = bucket.list_blobs(prefix=folder_name)
-    expected_report_count = 0
-    report_count = 0
-    reports = []
+    expected_report_count, report_count = 0, 0
+    reports, failed_pages = [], []
     if not blobs:
         alert_message = {
             "status": "alert",
@@ -69,6 +72,8 @@ def retrieve_reports_from_bucket(bucket_name, folder_name):
         reports.append(json.loads(report_data["result"]))
         expected_report_count = report_data["metadata"]["total_chunks"]
         report_count += 1
+        if "failed_pages" in report_data:
+            failed_pages.extend(report_data["metadata"]["failed_pages"])
     if report_count != expected_report_count:
         alert_message = {
             "status": "alert",
@@ -79,7 +84,7 @@ def retrieve_reports_from_bucket(bucket_name, folder_name):
     else:
         print("All reports found: ", report_count)
         logging.info("All reports found: ", report_count)
-    return reports
+    return reports, failed_pages
 
 
 def merge_dicts(list_of_dicts):
@@ -104,7 +109,7 @@ def main():
     known_cookies = json.load(open("known_cookies.json"))
     # print(f"known_cookies: {known_cookies}")
 
-    scan_result = combine_reports(AGGREGATE_REPORTS_BUCKET)
+    scan_result, failed_pages = combine_reports(AGGREGATE_REPORTS_BUCKET)
     # print(f"scan_result: {scan_result}")
     with open("scan_result.json", "w") as f:
         json.dump(scan_result, f)
@@ -116,6 +121,17 @@ def main():
     # save to file
     with open("unknown_cookies.json", "w") as f:
         json.dump(unknown_cookies, f)
+
+    if failed_pages:
+        error_message = {
+            "status": "error",
+            "message": "failed pages",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "data": {
+                "failed_pages": failed_pages,
+            }
+        }
+        logging.error(error_message)
 
     if unknown_cookies:
         alert_message = {
