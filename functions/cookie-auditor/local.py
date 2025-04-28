@@ -44,8 +44,8 @@ def combine_reports(bucket_name):
     failed_pages = list(dict.fromkeys(failed_pages))
     
     # # save to file
-    with open("combined_reports.json", "w") as f:
-        json.dump(failed_pages, f)
+    # with open("combined_reports.json", "w") as f:
+    #     json.dump(reports, f)
 
     return reports, failed_pages
 
