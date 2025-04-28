@@ -71,7 +71,12 @@ An aggregated scan result for all the page scanned will be saved with the follow
                 "https://blog.sentry.io/authors/johnny-bell/"
             ]
         }
-    }
+    },
+    "failed_pages":[
+        // this item only exisit if scan failure happens
+        "https://example1.com",
+        "https://example2.com"
+    ]
 }
 ```
 
