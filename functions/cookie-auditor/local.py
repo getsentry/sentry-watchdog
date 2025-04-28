@@ -73,7 +73,7 @@ def retrieve_reports_from_bucket(bucket_name, folder_name):
         expected_report_count = report_data["metadata"]["total_chunks"]
         report_count += 1
         if "failed_pages" in report_data:
-            failed_pages.extend(report_data["metadata"]["failed_pages"])
+            failed_pages.extend(report_data["failed_pages"])
     if report_count != expected_report_count:
         alert_message = {
             "status": "alert",
