@@ -12,6 +12,7 @@ resource "google_storage_bucket" "staging_bucket" {
   location                 = "US"
   force_destroy            = true
   public_access_prevention = "enforced"
+  uniform_bucket_level_access = true
   labels = {
     owner       = var.owner
     terraformed = "true"
