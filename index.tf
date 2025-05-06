@@ -6,6 +6,7 @@ module "infrastructure" {
   project_id      = var.project_id
   deploy_sa_email = var.deploy_sa_email
   owner           = var.owner
+  maintainers     = var.maintainers
 }
 
 module "functions" {

@@ -7,6 +7,13 @@ resource "google_service_account" "gha_cloud_functions_deployment" {
   project      = var.project
 }
 
+resource "google_service_account_iam_member" "maintainers" {
+  for_each = toset(var.maintainers)
+  service_account_id = google_service_account.gha_cloud_functions_deployment[0].id
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "group:${each.value}"
+}
+
 resource "google_storage_bucket" "staging_bucket" {
   name                     = "${var.project}-cloud-function-staging"
   location                 = "US"

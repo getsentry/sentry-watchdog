@@ -43,12 +43,19 @@ variable "deploy_sa_email" {
 variable "owner" {
   type        = string
   description = "The owner of the project, used for tagging resources and future ownership tracking"
+  default     = null
 }
 
 variable "log_destination" {
   type        = string
   description = "The log destination"
   default     = null
+}
+
+variable "maintainers" {
+  type        = list(string)
+  description = "The maintainers of the project, have access to impersonate service account to deploy infrastructure"
+  default     = []
 }
 
 # A hack to turn all var in the tfvars file into a variable map

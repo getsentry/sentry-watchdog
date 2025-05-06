@@ -24,3 +24,8 @@ variable "owner" {
   type        = string
   description = "The owner of the project, used for tagging resources and future ownership tracking"
 }
+
+variable "maintainers" {
+  type        = list(string)
+  description = "The maintainers of the project, have access to impersonate service account to deploy infrastructure"
+}
