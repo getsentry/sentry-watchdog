@@ -38,7 +38,12 @@ An aggregated scan result for all the page scanned will be saved with the follow
                 "https://blog.sentry.io/authors/johnny-bell/"
             ]
         }
-    }
+    },
+    "failed_pages":[
+        // this item only exisit if scan failure happens
+        "https://example1.com",
+        "https://example2.com"
+    ]
 }
 ```
 
@@ -61,6 +66,21 @@ If unknown cookies and/or trackers are found, the following message will be send
                 "https://sentry.io/for/web-vitals/"
             ]
         }
+    }
+}
+```
+
+If there's any failure in page scan, an error will be send to the logging destination you set up.
+```json
+{
+    "status": "error",
+    "message": "failed pages",
+    "timestamp": "2025-03-13T20: 51: 49.279927+00: 00",
+    "data": {
+        "failed_pages":[
+            "https://example1.com",
+            "https://example2.com"
+        ]
     }
 }
 ```

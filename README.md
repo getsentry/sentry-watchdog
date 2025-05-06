@@ -78,7 +78,7 @@ Besides cloud functions, terraform also creates [Pub/Sub Subscription and topic]
 ### Flow
 ![infrastrucre_diagram](img/sentry_watchdog_infra.png)
 
-## Deployement
+### Deployement
 
 Update `terraform.tfvars` with your configs, make sure you are auth to GCP, then run the following to deploy the infrastructure and all the cloud functions.
 You may need to re-run terraform apply several times to get everything deployed in place.
@@ -88,3 +88,14 @@ terraform init
 terraform plan
 terraform apply
 ```
+
+> GCS bucket access: we enabled `uniform_bucket_level_access` for the GCS buckets created by terraform, hence your will need explicit access to the buckets to update it after they are created, being `owner` of the GCP project will not be sufficient. You can either:
+> 1.  Add yourself as `maintainers` in `terraform.tfvars`, which will allow you to impersonate the deployment service account, and use the service account for deployment.
+> 2. Update the terraform and grant yourself explicit access to the GCS buckets.
+
+### Secrets Management
+Secret is a tricky item, we don't want to hardcode the secret values in Terraform for obvious reasons, but we do want to manage everything else like access in code, hence we take a special approach. We create the secret in Terraform [here](/infrastructure/secrets.tf), but not the value, which will need to be added to GCP Secret Manager after the secret was created by Terraform.
+Because of this, if you try to create a secret and add it to resources (e.g. cloud function) in one terraform apply, it will guarantee to fail because the secret has no value available. There's a few workarounds for this: 
+1. Separate the changes to multiple terraform apply: First create the secret and apply changes, next manually add the value to it in GCP console, then make changes to resources that need access to the secret
+2. Rerun terraform apply after failure: Do everything in one terraform apply and expect it to fail, even with the failure terraform should still create the secret. Manually add the secret value in GCP console, then re-run the same terraform apply, this time it should pass with no error.
+3. [For people who are fast at clicking buttons] Add secret value during terraform apply: while terraform is applying, there will be a time gap between secret being created and resources getting access to it, depends on how big your terraform is it can be something like a few seconds to a few minutes. You can technically monitor the terraform apply log closely and once you see the secret is created, go to GCP console and add the value to it immediately, and if you are fast enough you will have the secret value ready before terraform gets to secret <> resource binding :) 
