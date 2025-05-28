@@ -77,7 +77,7 @@ def retrieve_reports_from_bucket(bucket_name, folder_name):
     if report_count != expected_report_count:
         alert_message = {
             "status": "alert",
-            "message": f"Report missing: {expected_report_count - len(blobs)}",
+            "message": f"{expected_report_count - report_count} report(s) missing",
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
         logging.error(alert_message)
