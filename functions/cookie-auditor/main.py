@@ -75,7 +75,6 @@ def retrieve_reports_from_bucket(bucket_name, folder_name):
     client = storage.Client()
     bucket = client.bucket(bucket_name)
     blobs = bucket.list_blobs(prefix=folder_name)
-    total_blobs = bucket.get_blob_count(prefix=folder_name)
     expected_report_count, report_count = 0, 0
     reports, failed_pages = [], []
     if not blobs:
