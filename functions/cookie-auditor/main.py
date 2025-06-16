@@ -149,7 +149,8 @@ def main(request):
                 "failed_pages": failed_pages,
             }
         }
-        logging.error(error_message)
+        logging.info(error_message)
+        print(error_message)
 
     if unknown_cookies:
         alert_message = {
