@@ -32,7 +32,7 @@
     "axios": "^1.8.3",
     "lodash.flatten": "^4.4.0",
     "lodash.samplesize": "^4.2.0",
-    "npm": "^10.5.2",
+    "npm": "^10.9.6",
     "puppeteer": "^22.15.0",
     "puppeteer-har": "^1.1.2",
     "stacktrace-js": "^2.0.2",
