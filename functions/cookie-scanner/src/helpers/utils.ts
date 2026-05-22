@@ -1,26 +1,34 @@
 import crypto from 'crypto';
 import fs from 'fs';
-import { join } from 'path';
+import { resolve, relative } from 'path';
 import { BlacklightEvent } from '../types';
 import { Browser } from 'puppeteer';
+
+export const safePath = (baseDir: string, ...segments: string[]): string => {
+    const resolved = resolve(baseDir, ...segments);
+    const rel = relative(baseDir, resolved);
+    if (rel.startsWith('..') || resolve(resolved) !== resolved) {
+        throw new Error(`Path traversal detected: ${segments.join('/')}`);
+    }
+    return resolved;
+};
 
 export const hasOwnProperty = (object:object, property:string) => {
     return Object.prototype.hasOwnProperty.call(object, property);
 };
 
-const deleteFolderRecursive = path => {
-    if (fs.existsSync(path)) {
-        fs.readdirSync(path).forEach(file => {
-            const curPath = path + '/' + file;
+const deleteFolderRecursive = (dirPath: string) => {
+    const baseDir = resolve(dirPath);
+    if (fs.existsSync(baseDir)) {
+        fs.readdirSync(baseDir).forEach(file => {
+            const curPath = safePath(baseDir, file);
             if (fs.lstatSync(curPath).isDirectory()) {
-                // recurse
                 deleteFolderRecursive(curPath);
             } else {
-                // delete file
                 fs.unlinkSync(curPath);
             }
         });
-        fs.rmdirSync(path);
+        fs.rmdirSync(baseDir);
     }
 };
 
@@ -74,12 +82,13 @@ export const closeBrowser = async (browser: Browser) => {
     }
 };
 
-export const clearDir = (outDir, mkNewDir = true) => {
-    if (fs.existsSync(outDir)) {
-        deleteFolderRecursive(outDir);
+export const clearDir = (outDir: string, mkNewDir = true) => {
+    const resolved = resolve(outDir);
+    if (fs.existsSync(resolved)) {
+        deleteFolderRecursive(resolved);
     }
     if (mkNewDir) {
-        fs.mkdirSync(outDir);
+        fs.mkdirSync(resolved);
     }
 };
 
@@ -126,9 +135,9 @@ export const getScriptUrl = (item: BlacklightEvent) => {
     }
 };
 
-export const loadEventData = (dir, filename = 'inspection-log.ndjson') => {
+export const loadEventData = (dir: string, filename = 'inspection-log.ndjson') => {
     return fs
-        .readFileSync(join(dir, filename), 'utf-8')
+        .readFileSync(safePath(dir, filename), 'utf-8')
         .split('\n')
         .filter(m => m)
         .map(m => loadJSONSafely(m))

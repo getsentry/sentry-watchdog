@@ -1,10 +1,10 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import flatten from 'lodash.flatten';
-import { join } from 'path';
+
 import { Page } from 'puppeteer';
 import { getDomain, getHostname } from 'tldts';
 import { Cookie } from 'tough-cookie';
-import { getScriptUrl, hasOwnProperty } from '../helpers/utils';
+import { getScriptUrl, hasOwnProperty, safePath } from '../helpers/utils';
 
 const parseCookie = (cookieStr:string, url:string) => {
     const cookie = Cookie.parse(cookieStr);
@@ -193,7 +193,7 @@ export const captureBrowserCookies = async (page, outDir, filename = 'browser-co
     });
     await client.detach();
     try {
-        writeFileSync(join(outDir, filename), JSON.stringify({ browser_cookies }, null, 2));
+        writeFileSync(safePath(outDir, filename), JSON.stringify({ browser_cookies }, null, 2));
     } catch (error) {
         console.log(error);
         console.log('Couldnt save browser cookies to file');
@@ -201,10 +201,11 @@ export const captureBrowserCookies = async (page, outDir, filename = 'browser-co
     return browser_cookies;
 };
 
-export const loadBrowserCookies = (dataDir, filename = 'browser-cookies.json') => {
+export const loadBrowserCookies = (dataDir: string, filename = 'browser-cookies.json') => {
     try {
-        if (existsSync(join(dataDir, filename))) {
-            const cookies = JSON.parse(readFileSync(join(dataDir, filename), 'utf-8'));
+        const filePath = safePath(dataDir, filename);
+        if (existsSync(filePath)) {
+            const cookies = JSON.parse(readFileSync(filePath, 'utf-8'));
             return cookies.browser_cookies || [];
         } else {
             return [];
