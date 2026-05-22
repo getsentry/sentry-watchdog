@@ -94,10 +94,10 @@ export const getJsCookies = (events, url) => {
                 event.data.symbol.includes('cookie') &&
                 event.data.operation.startsWith('set') &&
                 typeof event.data.value !== 'undefined' &&
-                typeof Cookie.parse(event.data.value) !== 'undefined'
+                (event.data.value === '' || typeof Cookie.parse(event.data.value) !== 'undefined')
         )
         .map(event => {
-            const data         = parseCookie(event.data.value, url);
+            const data         = event.data.value && Cookie.parse(event.data.value) ? parseCookie(event.data.value, url) : null;
             const hasOwnDomain = hasOwnProperty(event, 'domain') && 
                                  event.domain !== null && 
                                  event.domain !== undefined;

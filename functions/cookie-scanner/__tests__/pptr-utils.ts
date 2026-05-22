@@ -146,7 +146,7 @@ describe('get-links', () => {
             expect(result).toStrictEqual(links);
         });
         it('recognizes every social link', () => {
-            const links:LinkObject[] = SOCIAL_URLS.map(url => ({ href: `www.${url}`, innerText: 'text', innerHtml: 'html'}));
+            const links:LinkObject[] = SOCIAL_URLS.map(url => ({ href: `www.${url.replace(/\\\./g, '.')}`, innerText: 'text', innerHtml: 'html'}));
             const result = getSocialLinks(links);
             expect(result).toHaveLength(links.length);
             expect(result).toStrictEqual(links);

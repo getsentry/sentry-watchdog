@@ -70,7 +70,8 @@
   "jest": {
     "testPathIgnorePatterns": [
       "shared",
-      "stack.js"
+      "stack.js",
+      "test-pages"
     ],
     "preset": "ts-jest",
     "globals": {
