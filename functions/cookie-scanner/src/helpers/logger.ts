@@ -1,5 +1,5 @@
-import path from 'path';
 import { setGracefulCleanup, tmpNameSync } from 'tmp';
+import { safePath } from './utils';
 
 // https://stackoverflow.com/a/45211015/1407622
 import { createLogger, format, transports } from 'winston';
@@ -15,7 +15,7 @@ export const getLogger = ({ outDir = '', quiet = false }) => {
         })
     );
 
-    const filename = outDir ? path.join(outDir, 'inspection-log.ndjson') : tmpNameSync({ postfix: '-log.ndjson' });
+    const filename = outDir ? safePath(outDir, 'inspection-log.ndjson') : tmpNameSync({ postfix: '-log.ndjson' });
 
     log_transports.push(
         new transports.File({

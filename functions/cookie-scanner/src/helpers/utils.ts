@@ -5,9 +5,10 @@ import { BlacklightEvent } from '../types';
 import { Browser } from 'puppeteer';
 
 export const safePath = (baseDir: string, ...segments: string[]): string => {
-    const resolved = resolve(baseDir, ...segments);
-    const rel = relative(baseDir, resolved);
-    if (rel.startsWith('..') || resolve(resolved) !== resolved) {
+    const base = resolve(baseDir);
+    const resolved = resolve(base, ...segments);
+    const rel = relative(base, resolved);
+    if (rel.startsWith('..') || rel.startsWith('/')) {
         throw new Error(`Path traversal detected: ${segments.join('/')}`);
     }
     return resolved;

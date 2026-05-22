@@ -140,7 +140,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
     let pageIndex = 1;
     let har = {} as any;
     let page_response = null;
-    const userDataDir = args.saveBrowserProfile ? join(args.outDir, 'browser-profile') : undefined;
+    const userDataDir = args.saveBrowserProfile ? safePath(args.outDir, 'browser-profile') : undefined;
     let didBrowserDisconnect = false;
 
     const options = {
@@ -225,7 +225,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
         if (args.captureHar) {
             har = new PuppeteerHar(page);
             await har.start({
-                path: args.outDir ? join(args.outDir, 'requests.har') : undefined
+                path: args.outDir ? safePath(args.outDir, 'requests.har') : undefined
             });
         }
         if (didBrowserDisconnect) {
