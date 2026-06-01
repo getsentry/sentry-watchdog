@@ -1,17 +1,17 @@
 import fs from 'fs';
-import path from 'path';
 import { Page } from 'puppeteer';
 import { promisify } from 'util';
+import { safePath } from '../helpers/utils';
 
 const writeFile = promisify(fs.writeFile);
 
 export const savePageContent = async (index, outDir, page: Page, screenshot = true) => {
     try {
         const html = await page.content();
-        const outPath = path.join(outDir, `${index}.html`);
+        const outPath = safePath(outDir, `${index}.html`);
         await writeFile(outPath, html);
         if (screenshot) {
-            const outPathImg = path.join(outDir, `${index}.jpeg`);
+            const outPathImg = safePath(outDir, `${index}.jpeg`);
             await page.screenshot({ path: outPathImg, type: 'jpeg', quality: 50 });
         }
     } catch (error) {

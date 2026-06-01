@@ -17,7 +17,7 @@ import { setupBlacklightInspector } from './inspectors/inspector';
 import { setupKeyLoggingInspector } from './inspectors/key-logging';
 import { setupSessionRecordingInspector } from './inspectors/session-recording';
 import { setUpThirdPartyTrackersInspector } from './inspectors/third-party-trackers';
-import { clearDir, closeBrowser } from './helpers/utils';
+import { clearDir, closeBrowser, safePath } from './helpers/utils';
 
 import chromium from '@sparticuz/chromium';
 
@@ -140,7 +140,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
     let pageIndex = 1;
     let har = {} as any;
     let page_response = null;
-    const userDataDir = args.saveBrowserProfile ? join(args.outDir, 'browser-profile') : undefined;
+    const userDataDir = args.saveBrowserProfile ? safePath(args.outDir, 'browser-profile') : undefined;
     let didBrowserDisconnect = false;
 
     const options = {
@@ -225,7 +225,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
         if (args.captureHar) {
             har = new PuppeteerHar(page);
             await har.start({
-                path: args.outDir ? join(args.outDir, 'requests.har') : undefined
+                path: args.outDir ? safePath(args.outDir, 'requests.har') : undefined
             });
         }
         if (didBrowserDisconnect) {
@@ -419,16 +419,15 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
         }, {});
 
         const json_dump = JSON.stringify({ ...output, reports }, null, 2);
-        writeFileSync(join(args.outDir, 'inspection.json'), json_dump);
+        writeFileSync(safePath(args.outDir, 'inspection.json'), json_dump);
         if (args.outDir.includes('bl-tmp')) {
             clearDir(args.outDir, false);
         }
-        // also save the reports to the report directory
         const report_name = inUrl
             .replace(/^https?:\/\//, '')
             .replace(/[^a-zA-Z0-9]/g, '_')
             .replace(/_+$/g, '');
-        writeFileSync(join(args.reportDir, `${report_name}.json`), json_dump);
+        writeFileSync(safePath(args.reportDir, `${report_name}.json`), json_dump);
         return { 
             status: 'success', 
             ...output, 
