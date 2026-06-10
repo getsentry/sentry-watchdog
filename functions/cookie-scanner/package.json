@@ -29,7 +29,7 @@
     "@google-cloud/storage": "6.9.0",
     "@sentry/google-cloud-serverless": "^9.5.0",
     "@sparticuz/chromium": "^133.0.0",
-    "axios": "^1.15.2",
+    "axios": "^1.16.0",
     "lodash.flatten": "^4.4.0",
     "lodash.samplesize": "^4.2.0",
     "puppeteer": "^22.15.0",
