@@ -1,5 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from 'fs';
 import flatten from 'lodash.flatten';
+import { basename } from 'path';
 
 import { Page } from 'puppeteer';
 import { getDomain, getHostname } from 'tldts';
@@ -203,7 +204,8 @@ export const captureBrowserCookies = async (page, outDir, filename = 'browser-co
 
 export const loadBrowserCookies = (dataDir: string, filename = 'browser-cookies.json') => {
     try {
-        const filePath = safePath(dataDir, filename);
+        const sanitizedFilename = basename(filename);
+        const filePath = safePath(dataDir, sanitizedFilename);
         if (existsSync(filePath)) {
             const cookies = JSON.parse(readFileSync(filePath, 'utf-8'));
             return cookies.browser_cookies || [];
