@@ -219,7 +219,17 @@ const reportGoogleAnalyticsEvents = (eventData: BlacklightEvent[]) => {
         // Match both the analytics collect beacons (google-analytics.com/collect and
         // GA4 /g/collect, incl. region* and www subdomains) and the Google Signals /
         // Ads endpoint (stats.g.doubleclick.net), as long as they carry a measurement id.
-        return (event.url.includes('google-analytics.com') || event.url.includes('stats.g.doubleclick'))
+        let hostname: string;
+        try {
+            hostname = new URL(event.url).hostname.toLowerCase();
+        } catch {
+            return false;
+        }
+
+        const isGoogleAnalyticsHost = hostname === 'google-analytics.com' || hostname.endsWith('.google-analytics.com');
+        const isGoogleSignalsHost = hostname === 'stats.g.doubleclick.net';
+
+        return (isGoogleAnalyticsHost || isGoogleSignalsHost)
             && (
                 event.url.includes('UA-') // old version of google ids
                 || event.url.includes('G-') // this and following are new version
