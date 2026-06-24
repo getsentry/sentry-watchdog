@@ -404,8 +404,9 @@ const reportTwitterPixel = (eventData: BlacklightEvent[]) => {
                             }
                         }
 
-                        // process data parameters
-                        if (event[1]) {
+                        // process data parameters (guard against a non-object event[1],
+                        // e.g. a string id: Object.entries on a string yields char indices)
+                        if (event[1] && typeof event[1] === 'object') {
                             Object.entries(event[1]).forEach(([k, v]) => {
                                 dataParams.push({
                                     key: k,
@@ -429,12 +430,15 @@ const reportTwitterPixel = (eventData: BlacklightEvent[]) => {
                         //e.g. [...{... "id": "123", "quantity": 1}]
                         else if (eventKey === 'contents' && Array.isArray(eventValue)) {
                             eventValue.forEach(kv => {
-                                Object.entries(kv).forEach(([k, v]) => {
-                                    dataParams.push({
-                                        key: k,
-                                        value: v
+                                // a null/primitive element would throw on Object.entries
+                                if (kv && typeof kv === 'object') {
+                                    Object.entries(kv).forEach(([k, v]) => {
+                                        dataParams.push({
+                                            key: k,
+                                            value: v
+                                        });
                                     });
-                                });
+                                }
                             });
                         }
                         // other data parameters
