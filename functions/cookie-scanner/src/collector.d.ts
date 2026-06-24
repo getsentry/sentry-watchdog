@@ -1,5 +1,7 @@
 import { PuppeteerLifeCycleEvent, PuppeteerLaunchOptions } from 'puppeteer';
-export type CollectorOptions = Partial<typeof DEFAULT_OPTIONS>;
+export type CollectorOptions = Partial<typeof DEFAULT_OPTIONS> & {
+    location?: string;
+};
 declare const DEFAULT_OPTIONS: {
     outDir: string;
     reportDir: string;

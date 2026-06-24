@@ -4,6 +4,7 @@
     "module": "commonjs",
     "declaration": true,
     "inlineSourceMap": true,
+    "skipLibCheck": true /* Skip type checking of dependency declaration files. Required so @types/node@24 compiles under TypeScript 4.9.x. */,
     "esModuleInterop": true /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */,
     // "strict": true /* Enable all strict type-checking options. */,
     /* Strict Type-Checking Options */

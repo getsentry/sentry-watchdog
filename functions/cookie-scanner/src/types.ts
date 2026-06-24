@@ -2,7 +2,12 @@ export interface Global {
     __DEV_SERVER__: string;
 }
 
-export type BlacklightEvent = JsInstrumentEvent | KeyLoggingEvent | BlacklightErrorEvent | TrackingRequestEvent | SessionRecordingEvent;
+export type BlacklightEvent = 
+    JsInstrumentEvent | 
+    KeyLoggingEvent | 
+    BlacklightErrorEvent | 
+    TrackingRequestEvent | 
+    SessionRecordingEvent;
 
 export interface KeyLoggingEvent {
     type: 'KeyLogging';
@@ -45,7 +50,7 @@ export interface TrackingRequestEvent {
     type: 'TrackingRequest';
     url: string;
     stack: any[];
-    data: { query?: any; filter: string; listName: string };
+    data: { query?: any; body?: any, filter: string; listName: string };
 }
 interface BlacklightErrorEvent {
     type: 'Error' | 'Error.BlacklightInspector' | 'Error.KeyLogging' | 'Error.JsInstrument';
@@ -122,3 +127,9 @@ export interface LogFormat {
 type ScriptUrl = string;
 type CanvasCallValue = string;
 export type CanvasCallMap = Map<ScriptUrl, Set<CanvasCallValue>>;
+
+export interface TikTokContext {
+    page?: { url?: string };
+    device?: Record<string, string>;
+    user?: Record<string, string>;
+}
