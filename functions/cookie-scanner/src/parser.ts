@@ -325,8 +325,9 @@ const reportTikTokPixelEvents = (eventData: BlacklightEvent[]) => {
 
                 pageUrl = context?.page?.url as string || '';
 
-                // extract advanced matching parameters
-                const userInfo = Object.assign({}, context.user, context.device);
+                // extract advanced matching parameters (context may be null/non-object;
+                // `context.user` would throw a TypeError when context is null)
+                const userInfo = Object.assign({}, context?.user, context?.device);
                 Object.entries(userInfo).forEach(([key, value]) => {
                     const description = TIKTOK_ADVANCED_MATCHING_PARAMETERS[key] ?? '';
                     advancedMatchingParams.push({ key, value, description });
@@ -346,8 +347,9 @@ const reportTikTokPixelEvents = (eventData: BlacklightEvent[]) => {
                 }
             }
 
-            // extract data parameters
-            if (key === "properties") {
+            // extract data parameters (guard against null/primitive `properties`:
+            // Object.entries(null) throws, and a string would yield character indices)
+            if (key === "properties" && value && typeof value === 'object') {
                 Object.entries(value).forEach(([key, value]) => {
                     dataParams.push({ key, value });
                 });
