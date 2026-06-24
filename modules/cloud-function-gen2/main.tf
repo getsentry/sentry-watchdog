@@ -4,6 +4,40 @@ resource "google_service_account" "function_sa" {
   description  = "Service account for ${var.name}, owned by ${var.owner}, managed by Terraform"
 }
 
+data "google_project" "project" {
+  project_id = var.project
+}
+
+# Event-triggered (gen2) functions are invoked via a Pub/Sub push subscription
+# created by Eventarc. The trigger identity (the function SA) must be allowed to
+# invoke the underlying Cloud Run service, receive Eventarc events, and have the
+# Pub/Sub service agent able to mint OIDC tokens on its behalf. Without these,
+# pushes are rejected with 403 and the function silently never runs.
+resource "google_cloud_run_service_iam_member" "event_trigger_invoker" {
+  count    = var.event_trigger != null ? 1 : 0
+  project  = google_cloudfunctions2_function.function.project
+  location = google_cloudfunctions2_function.function.location
+  service  = google_cloudfunctions2_function.function.name
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.function_sa.email}"
+}
+
+resource "google_project_iam_member" "event_trigger_eventreceiver" {
+  count   = var.event_trigger != null ? 1 : 0
+  project = var.project
+  role    = "roles/eventarc.eventReceiver"
+  member  = "serviceAccount:${google_service_account.function_sa.email}"
+}
+
+# Scoped to the function SA only (not project-wide) so the Pub/Sub service agent
+# can mint OIDC tokens for this trigger's identity exclusively.
+resource "google_service_account_iam_member" "pubsub_token_creator" {
+  count              = var.event_trigger != null ? 1 : 0
+  service_account_id = google_service_account.function_sa.name
+  role               = "roles/iam.serviceAccountTokenCreator"
+  member             = "serviceAccount:service-${data.google_project.project.number}@gcp-sa-pubsub.iam.gserviceaccount.com"
+}
+
 
 resource "google_cloudfunctions2_function_iam_member" "invoker_iam" {
   project        = google_cloudfunctions2_function.function.project
@@ -123,10 +157,11 @@ resource "google_cloudfunctions2_function" "function" {
   dynamic "event_trigger" {
     for_each = var.event_trigger != null ? [var.event_trigger] : []
     content {
-      event_type     = event_trigger.value.event_type
-      pubsub_topic   = "projects/${var.project}/topics/${event_trigger.value.pubsub_topic}"
-      retry_policy   = event_trigger.value.retry_policy
-      trigger_region = var.location
+      event_type            = event_trigger.value.event_type
+      pubsub_topic          = "projects/${var.project}/topics/${event_trigger.value.pubsub_topic}"
+      retry_policy          = event_trigger.value.retry_policy
+      trigger_region        = var.location
+      service_account_email = google_service_account.function_sa.email
     }
   }
 
@@ -135,6 +170,8 @@ resource "google_cloudfunctions2_function" "function" {
     google_secret_manager_secret_iam_member.secret_iam,
     google_service_account_iam_member.function_sa_actas_iam,
     google_service_account_iam_member.deploy_sa_actas_iam,
+    google_project_iam_member.event_trigger_eventreceiver,
+    google_service_account_iam_member.pubsub_token_creator,
     data.archive_file.source
   ]
 }
