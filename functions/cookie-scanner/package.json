@@ -44,7 +44,7 @@
     "@types/chrome": "^0.0.268",
     "@types/firefox-webext-browser": "^120.0.4",
     "@types/jest": "^27.5.1",
-    "@types/node": "^20.4.5",
+    "@types/node": "^24.13.2",
     "@types/puppeteer": "^5.4.6",
     "@types/stacktrace-js": "^2.0.3",
     "@types/winston": "^2.4.4",
@@ -85,6 +85,6 @@
     "globalTeardown": "./config/test-server-teardown.js"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=24.0.0"
   }
 }
