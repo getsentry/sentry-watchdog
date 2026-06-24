@@ -175,7 +175,8 @@ export const captureBrowserCookies = async (page, outDir, filename = 'browser-co
     });
     await client.detach();
     try {
-        writeFileSync(safePath(outDir, filename), JSON.stringify({ browser_cookies }, null, 2));
+        const sanitizedFilename = basename(filename);
+        writeFileSync(safePath(outDir, sanitizedFilename), JSON.stringify({ browser_cookies }, null, 2));
     } catch (error) {
         console.log(error);
         console.log('Couldnt save browser cookies to file');
