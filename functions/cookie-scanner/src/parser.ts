@@ -225,10 +225,13 @@ const reportGoogleAnalyticsEvents = (eventData: BlacklightEvent[]) => {
     });
 
     return googleAnalyticsEvents.map((event: TrackingRequestEvent) => {
-        const url = event.url;
-        delete event.url;
+        // Build a new object instead of `delete event.url`: these event objects
+        // are shared by reference across every report (getEventData hands out the
+        // same message instances), so mutating url here would strip it from later
+        // reports such as third_party_trackers (which runs after this one).
+        const { url, ...rest } = event;
         return {
-            ...event,
+            ...rest,
             raw: url,
         };
     });
