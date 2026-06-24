@@ -293,7 +293,9 @@ const reportFbPixelEvents = (eventData: BlacklightEvent[]) => {
 const reportTikTokPixelEvents = (eventData: BlacklightEvent[]) => {
     const events = eventData.filter(
         (e: TrackingRequestEvent) =>
-            e.url.includes('tiktok') && e.data.body && Object.keys(e.data.body).includes('event')
+            e.url.includes('tiktok') &&
+            e.data.body && typeof e.data.body === 'object' && !Array.isArray(e.data.body) &&
+            Object.keys(e.data.body).includes('event')
     );
     return events.map((e: TrackingRequestEvent) => {
         const advancedMatchingParams = [];

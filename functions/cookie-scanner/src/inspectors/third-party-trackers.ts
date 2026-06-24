@@ -60,7 +60,10 @@ export const setUpThirdPartyTrackersInspector = async (
                 try {
                     body = JSON.parse(postData);
                 } catch {
-                    body = postData;
+                    // Non-JSON body (e.g. URL-encoded form data): parse into an object so
+                    // downstream report filters that inspect body keys (e.g. TikTok's `event`)
+                    // keep working instead of receiving a raw string they can't read.
+                    body = Object.fromEntries(new URLSearchParams(postData));
                 }
             }
 
