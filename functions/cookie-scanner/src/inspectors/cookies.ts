@@ -7,7 +7,7 @@ import { getDomain, getHostname } from 'tldts';
 import { Cookie } from 'tough-cookie';
 import { getScriptUrl, hasOwnProperty, safePath } from '../helpers/utils';
 
-const parseCookie = (cookieStr:string, url:string) => {
+const parseCookie = (cookieStr: string, url: string) => {
     const cookie = Cookie.parse(cookieStr);
     try {
         if (typeof cookie !== 'undefined') {
@@ -98,23 +98,12 @@ export const getJsCookies = (events, url) => {
                 (event.data.value === '' || typeof Cookie.parse(event.data.value) !== 'undefined')
         )
         .map(event => {
-            const data         = event.data.value && Cookie.parse(event.data.value) ? parseCookie(event.data.value, url) : null;
-            const hasOwnDomain = hasOwnProperty(event, 'domain') && 
-                                 event.domain !== null && 
-                                 event.domain !== undefined;
-            const hasOwnName   = data && 
-                                 hasOwnProperty(data, 'key') && 
-                                 data.key !== null && 
-                                 data.key !== undefined;
-            const hasOwnPath   = data && 
-                                 hasOwnProperty(data, 'path') && 
-                                 data.path !== null && 
-                                 data.path !== undefined;
-            const hasOwnValue  = data && 
-                                 hasOwnProperty(data, 'value') && 
-                                 data.value !== null && 
-                                 data.value !== undefined;
-            const script       = getScriptUrl(event);
+            const data = event.data.value && Cookie.parse(event.data.value) ? parseCookie(event.data.value, url) : null;
+            const hasOwnDomain = hasOwnProperty(event, 'domain') && event.domain !== null && event.domain !== undefined;
+            const hasOwnName = data && hasOwnProperty(data, 'key') && data.key !== null && data.key !== undefined;
+            const hasOwnPath = data && hasOwnProperty(data, 'path') && data.path !== null && data.path !== undefined;
+            const hasOwnValue = data && hasOwnProperty(data, 'value') && data.value !== null && data.value !== undefined;
+            const script = getScriptUrl(event);
 
             return {
                 domain: hasOwnDomain ? event.domain : getDomain(url),
@@ -138,12 +127,7 @@ export const matchCookiesToEvents = (cookies, events, url) => {
                 third_party: getDomain(url) !== getDomain(`cookie://${jsCookie.domain}${jsCookie.path}`),
                 type: 'js'
             }))
-            .filter(
-                (thing, index, self) =>
-                    index === self.findIndex(
-                        t => t.name === thing.name && t.domain === thing.domain
-                    )
-            );
+            .filter((thing, index, self) => index === self.findIndex(t => t.name === thing.name && t.domain === thing.domain));
         const http = httpCookie
             .map(httpCookie => ({
                 ...httpCookie,
@@ -151,10 +135,7 @@ export const matchCookiesToEvents = (cookies, events, url) => {
                 type: 'http'
             }))
             .filter(
-                (thing, index, self) => 
-                    index === self.findIndex(
-                        t => t.name === thing.name && t.domain === thing.domain && t.value === thing.value
-                    )
+                (thing, index, self) => index === self.findIndex(t => t.name === thing.name && t.domain === thing.domain && t.value === thing.value)
             );
         return [...js, ...http];
     }

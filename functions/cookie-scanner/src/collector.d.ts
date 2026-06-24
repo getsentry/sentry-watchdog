@@ -18,7 +18,7 @@ declare const DEFAULT_OPTIONS: {
     saveScreenshots: boolean;
     headers: {};
     blTests: string[];
-    puppeteerExecutablePath: string;
+    puppeteerExecutablePath: string | null;
     extraChromiumArgs: string[];
     extraPuppeteerOptions: Partial<PuppeteerLaunchOptions>;
 };

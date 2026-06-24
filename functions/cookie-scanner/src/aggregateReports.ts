@@ -21,8 +21,8 @@ interface ScanReport {
 }
 
 export async function aggregateReports(customConfig: ScannerConfig): Promise<string> {
-    const reportDir = join(os.tmpdir(),customConfig.output.reportDir);
-    
+    const reportDir = join(os.tmpdir(), customConfig.output.reportDir);
+
     if (!fs.existsSync(reportDir)) {
         fs.mkdirSync(reportDir, { recursive: true });
     }
