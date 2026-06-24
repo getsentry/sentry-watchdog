@@ -18,6 +18,15 @@ export const hasOwnProperty = (object: object, property: string) => {
     return Object.prototype.hasOwnProperty.call(object, property);
 };
 
+export const urlToSafeFilename = (url: string): string => {
+    const name = url.replace(/^https?:\/\//, '').replace(/[^a-zA-Z0-9]/g, '_');
+    let end = name.length;
+    while (end > 0 && name[end - 1] === '_') {
+        end--;
+    }
+    return name.slice(0, end);
+};
+
 const deleteFolderRecursive = (dirPath: string) => {
     const baseDir = resolve(dirPath);
     if (fs.existsSync(baseDir)) {

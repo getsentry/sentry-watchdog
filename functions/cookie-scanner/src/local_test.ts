@@ -4,6 +4,7 @@ import { aggregateReports } from './aggregateReports';
 import { ScannerConfig } from './types';
 import * as fs from 'fs';
 import * as os from 'os';
+import { urlToSafeFilename } from './helpers/utils';
 
 export { collect, CollectorOptions } from './collector';
 export { aggregateReports } from './aggregateReports';
@@ -22,14 +23,7 @@ async function scanUrl(url: string, config: ScannerConfig): Promise<void> {
             },
             userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'
         },
-        outDir: join(
-            os.tmpdir(),
-            config?.output?.outDir || 'out',
-            url
-                .replace(/^https?:\/\//, '')
-                .replace(/[^a-zA-Z0-9]/g, '_')
-                .replace(/_+$/g, '')
-        ),
+        outDir: join(os.tmpdir(), config?.output?.outDir || 'out', urlToSafeFilename(url)),
         reportDir: join(os.tmpdir(), config?.output?.reportDir || 'reports'),
         extraChromiumArgs: config?.scanner?.extraChromiumArgs || ['--disable-features=TrackingProtection3pcd'],
         extraPuppeteerOptions: {
