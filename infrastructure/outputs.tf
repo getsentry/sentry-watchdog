@@ -6,3 +6,7 @@ output "secret_ids" {
 output "deploy_sa_email" {
   value = var.deploy_sa_email != null ? var.deploy_sa_email : google_service_account.gha_cloud_functions_deployment[0].email
 }
+
+output "deploy_sa_id" {
+  value = var.deploy_sa_email != null ? "projects/${var.project}/serviceAccounts/${var.deploy_sa_email}" : google_service_account.gha_cloud_functions_deployment[0].id
+}

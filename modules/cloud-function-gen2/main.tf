@@ -89,6 +89,7 @@ resource "google_cloudfunctions2_function" "function" {
   build_config {
     runtime           = var.runtime
     entry_point       = var.function_entrypoint
+    service_account   = var.build_sa_id
     docker_repository = "projects/${var.project}/locations/${var.location}/repositories/gcf-artifacts"
     source {
       storage_source {

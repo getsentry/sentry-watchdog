@@ -6,6 +6,8 @@ locals {
     "roles/secretmanager.secretAccessor",   # access to Secret Manager
     "roles/cloudfunctions.developer",       # deploy and manage Cloud Functions
     "roles/logging.viewer",                 # view logs
+    "roles/logging.logWriter",              # write build logs when Cloud Build builds functions
+    "roles/artifactregistry.writer",        # push function container images to Artifact Registry
     "roles/iam.serviceAccountUser",         # necessary to invoke Cloud Functions
     "roles/iam.workloadIdentityPoolViewer", # view workload identity pool
     "roles/iam.serviceAccountCreator",      # create service accounts
