@@ -1,10 +1,10 @@
-
 import { join } from 'path';
 import { collect, CollectorOptions } from './collector';
 import { aggregateReports } from './aggregateReports';
 import { ScannerConfig } from './types';
 import * as fs from 'fs';
 import * as os from 'os';
+import { urlToSafeFilename } from './helpers/utils';
 
 export { collect, CollectorOptions } from './collector';
 export { aggregateReports } from './aggregateReports';
@@ -23,29 +23,14 @@ async function scanUrl(url: string, config: ScannerConfig): Promise<void> {
             },
             userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36'
         },
-        outDir: join(
-            os.tmpdir(),
-            config?.output?.outDir || 'out',
-            url
-                .replace(/^https?:\/\//, '')
-                .replace(/[^a-zA-Z0-9]/g, '_')
-                .replace(/_+$/g, '')
-        ),
+        outDir: join(os.tmpdir(), config?.output?.outDir || 'out', urlToSafeFilename(url)),
         reportDir: join(os.tmpdir(), config?.output?.reportDir || 'reports'),
-        extraChromiumArgs: config?.scanner?.extraChromiumArgs || [
-            '--disable-features=TrackingProtection3pcd'
-        ],
+        extraChromiumArgs: config?.scanner?.extraChromiumArgs || ['--disable-features=TrackingProtection3pcd'],
         extraPuppeteerOptions: {
             protocolTimeout: 120000,
             timeout: 120000,
             ...config?.scanner?.extraPuppeteerOptions,
-            args: [
-                '--no-sandbox',
-                '--disable-setuid-sandbox',
-                '--disable-dev-shm-usage',
-                '--disable-accelerated-2d-canvas',
-                '--disable-gpu'
-            ]
+            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-accelerated-2d-canvas', '--disable-gpu']
         }
     };
 
@@ -78,22 +63,22 @@ async function scanUrl(url: string, config: ScannerConfig): Promise<void> {
     }
 }
 
-const INPUT = '{"title": "Sentry Cookie Scanner", "scanner": {"headless": false, "numPages": 0, "captureHar": false, "saveScreenshots": false, "emulateDevice": {"viewport": {"height": 1920, "width": 1080}, "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"}}, "maxConcurrent": 20, "chunkSize": 80, "total_pages": 3479, "total_chunks": 44, "chunk_no": 41, "target": ["https://sentry.io/for/python/", "https://blog.sentry.io/stack-trace-line-numbers-for-unity-events/", "https://blog.sentry.io/mitigating-user-friction-with-performance-monitoring/"]}'
+const INPUT =
+    '{"title": "Sentry Cookie Scanner", "scanner": {"headless": false, "numPages": 0, "captureHar": false, "saveScreenshots": false, "emulateDevice": {"viewport": {"height": 1920, "width": 1080}, "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.3"}}, "maxConcurrent": 20, "chunkSize": 80, "total_pages": 3479, "total_chunks": 44, "chunk_no": 41, "target": ["https://sentry.io/for/python/", "https://blog.sentry.io/stack-trace-line-numbers-for-unity-events/", "https://blog.sentry.io/mitigating-user-friction-with-performance-monitoring/"]}';
 
-const today = new Date().toISOString().slice(0, 10).replace(/-/g, ""); // Format: YYYYMMDD
+const today = new Date().toISOString().slice(0, 10).replace(/-/g, ''); // Format: YYYYMMDD
 const folderName = `${today}/`; // Folder with today's date
 
 async function main() {
     const failedPages: string[] = [];
 
     try {
-
         // Decode message
         const parsedData = JSON.parse(INPUT);
-        const job_id = `${today}[${parsedData.chunk_no}/${parsedData.total_chunks}]`
-        console.log("--------------------------------")
-        console.log(parsedData.title, " chunk_no: ", parsedData.chunk_no, " of ", parsedData.total_chunks);
-        console.log("--------------------------------")
+        const job_id = `${today}[${parsedData.chunk_no}/${parsedData.total_chunks}]`;
+        console.log('--------------------------------');
+        console.log(parsedData.title, ' chunk_no: ', parsedData.chunk_no, ' of ', parsedData.total_chunks);
+        console.log('--------------------------------');
 
         const metadata = {
             title: parsedData.title,
@@ -101,7 +86,7 @@ async function main() {
             chunk_no: parsedData.chunk_no,
             total_chunks: parsedData.total_chunks,
             total_pages: parsedData.total_pages
-        }
+        };
 
         const { title, scanner, target, maxConcurrent } = parsedData;
         const customConfig: ScannerConfig = {
@@ -114,7 +99,6 @@ async function main() {
                 reportDir: 'reports'
             }
         };
-        
 
         let pagesToScan: string[] = parsedData.target;
         let running = 0;
@@ -156,7 +140,7 @@ async function main() {
                         running--;
                     }
                 })();
-                
+
                 scanPromises.push(scanPromise);
                 processNext(); // Continue processing next items
             }
@@ -170,21 +154,18 @@ async function main() {
 
         console.log(`${job_id} All scans completed, generating aggregate report`);
         const aggregatedReport = await aggregateReports(customConfig);
-        const result = {metadata, result: aggregatedReport};
+        const result = { metadata, result: aggregatedReport };
         console.log(result);
 
         if (failedPages.length > 0) {
-            console.log({"failed pages": failedPages,
-                    "job_id": job_id,
-                    "failed_pages": failedPages
-        })
-
-    }} catch (error) {
+            console.log({ 'failed pages': failedPages, job_id: job_id, failed_pages: failedPages });
+        }
+    } catch (error) {
         console.log({
-            "status": "error",
-            "message": "scanner failed",
-            "timestamp": new Date().toISOString(),
-            "data": error.message
+            status: 'error',
+            message: 'scanner failed',
+            timestamp: new Date().toISOString(),
+            data: error.message
         });
     }
 }

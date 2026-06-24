@@ -2,6 +2,7 @@ import { BlacklightEvent } from '../types';
 import { Browser } from 'puppeteer';
 export declare const safePath: (baseDir: string, ...segments: string[]) => string;
 export declare const hasOwnProperty: (object: object, property: string) => any;
+export declare const urlToSafeFilename: (url: string) => string;
 export declare const closeBrowser: (browser: Browser) => Promise<void>;
 export declare const clearDir: (outDir: string, mkNewDir?: boolean) => void;
 export declare const loadJSONSafely: (str: string) => any;

@@ -11,10 +11,10 @@ const MIN_FONT_LIST_SIZE = 50;
 const MIN_TEXT_MEASURE_COUNT = 50;
 const MIN_TEXT_LENGTH = 10;
 
-const CANVAS_READ_FUNCS          = ['HTMLCanvasElement.toDataURL', 'CanvasRenderingContext2D.getImageData'];
-const CANVAS_WRITE_FUNCS         = ['CanvasRenderingContext2D.fillText', 'CanvasRenderingContext2D.strokeText'];
+const CANVAS_READ_FUNCS = ['HTMLCanvasElement.toDataURL', 'CanvasRenderingContext2D.getImageData'];
+const CANVAS_WRITE_FUNCS = ['CanvasRenderingContext2D.fillText', 'CanvasRenderingContext2D.strokeText'];
 const CANVAS_FP_DO_NOT_CALL_LIST = ['CanvasRenderingContext2D.save', 'CanvasRenderingContext2D.restore', 'HTMLCanvasElement.addEventListener'];
-const CANVAS_FONT                = ['CanvasRenderingContext2D.measureText', 'CanvasRenderingContext2D.font'];
+const CANVAS_FONT = ['CanvasRenderingContext2D.measureText', 'CanvasRenderingContext2D.font'];
 
 /**
  * Return the string that is written onto canvas from function arguments
@@ -56,12 +56,12 @@ const isImageTooSmall = (args: string[]) => {
  * @see {@link http://randomwalker.info/publications/OpenWPM_1_million_site_tracking_measurement.pdf#page=12}
  */
 export const sortCanvasCalls = (canvasCalls: BlacklightEvent[]) => {
-    const cReads    = new Map() as CanvasCallMap;
+    const cReads = new Map() as CanvasCallMap;
     const cDataUrls = new Map() as CanvasCallMap;
-    const cWrites   = new Map() as CanvasCallMap;
-    const cTexts    = new Map() as CanvasCallMap;
-    const cBanned   = new Map() as CanvasCallMap;
-    const cStyles   = new Map() as CanvasCallMap;
+    const cWrites = new Map() as CanvasCallMap;
+    const cTexts = new Map() as CanvasCallMap;
+    const cBanned = new Map() as CanvasCallMap;
+    const cStyles = new Map() as CanvasCallMap;
 
     for (const item of canvasCalls) {
         const { url, data } = item as JsInstrumentEvent;
@@ -125,7 +125,7 @@ export const getCanvasFingerprinters = (
 
         const rwIntersection = new Set([...url_hosts].filter(x => cWrites.has(script_url) && cWrites.get(script_url).has(x)));
         if (rwIntersection.size < 1) continue;
-    
+
         for (const canvasRwVisit of rwIntersection.values()) {
             if (cBanned.has(script_url) && cBanned.get(script_url).has(canvasRwVisit)) {
                 continue;

@@ -7,11 +7,13 @@ import { loadEventData } from "../src/helpers/utils";
 import { join } from "path";
 import {
   captureBrowserCookies,
+  loadBrowserCookies,
   setupHttpCookieCapture,
   getJsCookies,
   matchCookiesToEvents,
 } from "../src/inspectors/cookies";
-import { existsSync } from "fs";
+import { existsSync, mkdtempSync, rmSync } from "fs";
+import { tmpdir } from "os";
 import { getLogger } from "../src/helpers/logger";
 jest.setTimeout(20000);
 
@@ -463,6 +465,36 @@ const PP_TEST_RESULT_NO_BROWSER_COOKIES_JSON = [
     third_party: false,
   },
 ];
+
+it("capture and load resolve filenames with directory separators to the same path", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "cookie-path-test-"));
+  const mockCookies = [{ name: "test", domain: "example.com", value: "1" }];
+  const mockPage = {
+    target: () => ({
+      createCDPSession: async () => ({
+        send: async (cmd: string) => {
+          if (cmd === "Network.getAllCookies") {
+            return { cookies: mockCookies };
+          }
+        },
+        detach: async () => {},
+      }),
+    }),
+  };
+
+  try {
+    await captureBrowserCookies(mockPage, dir, "subdir/cookies.json");
+    expect(existsSync(join(dir, "cookies.json"))).toBe(true);
+    expect(existsSync(join(dir, "subdir", "cookies.json"))).toBe(false);
+    expect(loadBrowserCookies(dir, "subdir/cookies.json")).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ name: "test", domain: "example.com" }),
+      ])
+    );
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
 
 // FIXME: Make a more robust test page for testing cookies. Relying on a real website that can change is silly.
 it("can capture cookies from the browser, javascript and network requests", async () => {

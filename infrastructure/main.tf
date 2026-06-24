@@ -8,17 +8,17 @@ resource "google_service_account" "gha_cloud_functions_deployment" {
 }
 
 resource "google_service_account_iam_member" "maintainers" {
-  for_each = toset(var.maintainers)
+  for_each           = toset(var.maintainers)
   service_account_id = google_service_account.gha_cloud_functions_deployment[0].id
   role               = "roles/iam.serviceAccountTokenCreator"
   member             = "group:${each.value}"
 }
 
 resource "google_storage_bucket" "staging_bucket" {
-  name                     = "${var.project}-cloud-function-staging"
-  location                 = "US"
-  force_destroy            = true
-  public_access_prevention = "enforced"
+  name                        = "${var.project}-cloud-function-staging"
+  location                    = "US"
+  force_destroy               = true
+  public_access_prevention    = "enforced"
   uniform_bucket_level_access = true
   versioning {
     enabled = true
