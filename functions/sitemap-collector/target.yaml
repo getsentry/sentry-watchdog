@@ -1,7 +1,8 @@
 sitemaps:
   - https://sentry.io/sitemap/sitemap-0.xml
   - https://blog.sentry.io/sitemap/sitemap-0.xml
-  - https://sentry.engineering/sitemap.xml
+  # sentry.engineering was merged into blog.sentry.io/engineering/; its sitemap.xml
+  # now 308-redirects to an HTML page and breaks XML parsing
   - https://sentry.design/sitemap-0.xml
 rss:
   - https://sentry.io/changelog/feed.xml
