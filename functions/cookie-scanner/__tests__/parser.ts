@@ -158,7 +158,16 @@ it("can parse Google Analytics tracking events", async () => {
   // stats.g.doubleclick endpoint (which alone matched only the two URLs below).
   expect(report.length).toBe(318);
   expect(report.every((r) => /[?&]tid=(G-|UA-|AW-)/.test(r.raw))).toBe(true);
-  expect(report.filter((r) => r.raw.includes("google-analytics.com")).length).toBe(316);
+  expect(
+    report.filter((r) => {
+      try {
+        const host = new URL(r.raw).hostname;
+        return host === "google-analytics.com" || host.endsWith(".google-analytics.com");
+      } catch {
+        return false;
+      }
+    }).length
+  ).toBe(316);
   // the two original stats.g.doubleclick beacons are still included
   pageUrls.forEach((u) => expect(report.map((r) => r.raw)).toContain(u));
 });
