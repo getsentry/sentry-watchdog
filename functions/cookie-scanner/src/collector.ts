@@ -3,7 +3,7 @@ import sampleSize from 'lodash.samplesize';
 import os from 'os';
 import { join } from 'path';
 import puppeteer, { Browser, Page, PuppeteerLifeCycleEvent, KnownDevices, PuppeteerLaunchOptions } from 'puppeteer';
-import PuppeteerHar from 'puppeteer-har';
+import { captureNetwork } from '@themarkup/puppeteer-har';
 import { getDomain, getSubdomain, parse } from 'tldts';
 import { captureBrowserCookies, clearCookiesCache, setupHttpCookieCapture } from './inspectors/cookies';
 
@@ -21,7 +21,7 @@ import { clearDir, closeBrowser, safePath, urlToSafeFilename } from './helpers/u
 
 import chromium from '@sparticuz/chromium';
 
-export type CollectorOptions = Partial<typeof DEFAULT_OPTIONS>;
+export type CollectorOptions = Partial<typeof DEFAULT_OPTIONS> & {location?: string};
 
 const DEFAULT_OPTIONS = {
     outDir: join(process.cwd(), 'bl-tmp'),
@@ -46,6 +46,9 @@ const DEFAULT_OPTIONS = {
         'canvas_font_fingerprinters',
         'cookies',
         'fb_pixel_events',
+        'tiktok_pixel_events',
+        'twitter_pixel_events',
+        'google_analytics_events',
         'key_logging',
         'session_recorders',
         'third_party_trackers'
@@ -90,6 +93,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
 
     const output: any = {
         title: args.title,
+        page_title: '',
         uri_ins: inUrl,
         uri_dest: null,
         uri_redirects: null,
@@ -122,6 +126,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
         start_time: new Date(),
         end_time: null
     };
+    if (args.location) output.location = args.location;
 
     // Log network requests and page links
     const hosts = {
@@ -139,6 +144,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
     let page: Page;
     let pageIndex = 1;
     let har = {} as any;
+    const harOutputPath = args.outDir ? safePath(args.outDir, 'requests.har') : undefined;
     let page_response = null;
     const userDataDir = args.saveBrowserProfile ? safePath(args.outDir, 'browser-profile') : undefined;
     let didBrowserDisconnect = false;
@@ -223,10 +229,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
         await setUpThirdPartyTrackersInspector(page, logger.warn, args.enableAdBlock);
 
         if (args.captureHar) {
-            har = new PuppeteerHar(page);
-            await har.start({
-                path: args.outDir ? safePath(args.outDir, 'requests.har') : undefined
-            });
+            har = await captureNetwork(page);
         }
         if (didBrowserDisconnect) {
             return {
@@ -257,6 +260,10 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
         // Go to the first url
         // console.log('Going to the first url', inUrl);
         await navigateWithTimeout(page, inUrl, args.defaultTimeout, args.defaultWaitUntil as PuppeteerLifeCycleEvent);
+
+        // Save landing page title
+        const title = await page.title();
+        output.page_title = title;
 
         pageIndex++;
         // console.log('Saving first page response');
@@ -333,7 +340,7 @@ export const collect = async (inUrl: string, args: CollectorOptions) => {
 
         await captureBrowserCookies(page, args.outDir);
         if (args.captureHar) {
-            await har.stop();
+            await har(harOutputPath);
         }
 
         const pages = await browser.pages();

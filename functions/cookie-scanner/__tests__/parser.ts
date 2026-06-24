@@ -122,7 +122,11 @@ it("can parse FB Pixel tracking events", async () => {
   ];
   expect(report.length).toBe(4);
   expect(report.map((r) => r.pageUrl).sort()).toEqual(pageUrls.sort());
-  expect(report[0].advancedMatchingParams.length).toEqual(4);
+  // advancedMatchingParams are per-event: previously every event shared and accumulated
+  // into one array. The homepage hit carries none; the other three each carry their own 4.
+  expect(report.map((r) => r.advancedMatchingParams.length).sort()).toEqual([0, 4, 4, 4]);
+  // each event must reference its own array instance (regression guard for the shared-array bug)
+  expect(new Set(report.map((r) => r.advancedMatchingParams)).size).toBe(4);
   expect(report[0].eventName).toBe("PageView");
   expect(report[0].eventDescription).toBe(
     "This is the default pixel tracking page visits. For example - A person lands on your website pages."
@@ -140,4 +144,30 @@ it.skip("can parse FB Pixel tracking events - live capture", async () => {
   await browser.close();
   const report = generateReport("fb_pixel_events", rows, null, null);
   expect(report.map((r) => r.eventName)).toContain("PageView");
+});
+
+it("can parse Google Analytics tracking events", async () => {
+  const TEST_DIR = join(__dirname, "test-data", "veteransunited-1.0.3");
+  const rawEvents = loadEventData(TEST_DIR);
+  const pageUrls = [
+    'https://stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j82&tid=UA-30102-16&cid=852100309.1589758701&jid=2012734374&gjid=2113596298&_gid=1708403671.1589758701&_u=YGBAgEABAAAAIE~&z=549701973',
+    'https://stats.g.doubleclick.net/j/collect?t=dc&aip=1&_r=3&v=1&_v=j82&tid=UA-30102-16&cid=852100309.1589758701&jid=1563152953&gjid=595724329&_gid=1708403671.1589758701&_u=yDCAgEABAAAAIE~&z=176641512'
+  ];
+  const report = generateReport("google_analytics_events", rawEvents, null, null);
+  // Captures google-analytics.com /collect and GA4 /g/collect beacons too, not just the
+  // stats.g.doubleclick endpoint (which alone matched only the two URLs below).
+  expect(report.length).toBe(318);
+  expect(report.every((r) => /[?&]tid=(G-|UA-|AW-)/.test(r.raw))).toBe(true);
+  expect(
+    report.filter((r) => {
+      try {
+        const host = new URL(r.raw).hostname;
+        return host === "google-analytics.com" || host.endsWith(".google-analytics.com");
+      } catch {
+        return false;
+      }
+    }).length
+  ).toBe(316);
+  // the two original stats.g.doubleclick beacons are still included
+  pageUrls.forEach((u) => expect(report.map((r) => r.raw)).toContain(u));
 });

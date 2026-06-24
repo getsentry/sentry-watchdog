@@ -37,3 +37,21 @@ export declare const FB_STANDARD_EVENTS: {
     eventName: string;
 }[];
 export declare const SOCIAL_URLS: string[];
+export declare const TIKTOK_STANDARD_EVENTS: {
+    eventDescription: string;
+    eventName: string;
+}[];
+export declare const TIKTOK_ADVANCED_MATCHING_PARAMETERS: {
+    email: string;
+    phone_number: string;
+    external_id: string;
+    anonymous_id: string;
+};
+export declare const TWITTER_ADVANCED_MATCHING_PARAMETERS: {
+    email: string;
+    phone_number: string;
+};
+export declare const TWITTER_STANDARD_EVENTS: {
+    eventDescription: string;
+    eventName: string;
+}[];

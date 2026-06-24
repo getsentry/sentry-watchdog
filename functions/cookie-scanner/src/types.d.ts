@@ -37,6 +37,7 @@ export interface TrackingRequestEvent {
     stack: any[];
     data: {
         query?: any;
+        body?: any;
         filter: string;
         listName: string;
     };
@@ -112,4 +113,11 @@ export interface LogFormat {
 type ScriptUrl = string;
 type CanvasCallValue = string;
 export type CanvasCallMap = Map<ScriptUrl, Set<CanvasCallValue>>;
+export interface TikTokContext {
+    page?: {
+        url?: string;
+    };
+    device?: Record<string, string>;
+    user?: Record<string, string>;
+}
 export {};

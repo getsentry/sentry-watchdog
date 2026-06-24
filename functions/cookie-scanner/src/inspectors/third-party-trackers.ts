@@ -33,6 +33,7 @@ export const setUpThirdPartyTrackersInspector = async (
         let isBlocked = false;
 
         for (const [listName, blocker] of Object.entries(blockers)) {
+            // if any request match the third party rules
             const { match, filter } = blocker.match(fromPuppeteerDetails(request));
 
             if (!match) {
@@ -41,6 +42,7 @@ export const setUpThirdPartyTrackersInspector = async (
 
             isBlocked = true;
 
+            // handle get methods requests
             const params = new URL(request.url()).searchParams;
             const query = {};
             for (const [key, value] of params.entries()) {
@@ -51,11 +53,26 @@ export const setUpThirdPartyTrackersInspector = async (
                 }
             }
 
+            // handle post methods requests
+            let body = {}
+            const postData = request.postData();
+            if (postData) {
+                try {
+                    body = JSON.parse(postData);
+                } catch {
+                    // Non-JSON body (e.g. URL-encoded form data): parse into an object so
+                    // downstream report filters that inspect body keys (e.g. TikTok's `event`)
+                    // keep working instead of receiving a raw string they can't read.
+                    body = Object.fromEntries(new URLSearchParams(postData));
+                }
+            }
+
             eventDataHandler({
                 data: {
-                    query,
-                    filter: filter.toString(),
-                    listName
+                    query, 
+                    body,
+                    filter: filter.toString(), 
+                    listName 
                 },
                 stack: [
                     {
@@ -79,3 +96,4 @@ export const setUpThirdPartyTrackersInspector = async (
         }
     });
 };
+
