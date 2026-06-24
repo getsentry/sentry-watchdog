@@ -210,7 +210,7 @@ exports.SOCIAL_URLS = [
     'douyin\\.com',
     'kuaishou\\.com',
     'weibo\\.com',
-    'im\\.qq\\.com',
+    'im\\.qq\\.com'
 ];
 // https://web.archive.org/web/20250901012520/https://ads.tiktok.com/help/article/standard-events-parameters?lang=en
 exports.TIKTOK_STANDARD_EVENTS = [

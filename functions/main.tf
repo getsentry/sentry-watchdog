@@ -9,6 +9,7 @@ variable "project" {}
 variable "region" {}
 variable "secret_ids" {}
 variable "deploy_sa_email" {}
+variable "build_sa_id" {}
 variable "local_variables" {}
 variable "owner" {}
 
@@ -45,6 +46,7 @@ module "cloud_function_gen2" {
   project         = var.project
   secret_ids      = var.secret_ids
   deploy_sa_email = var.deploy_sa_email
+  build_sa_id     = var.build_sa_id
   owner           = var.owner
 }
 

@@ -78,6 +78,11 @@ variable "deploy_sa_email" {
   description = "Service account used for CD in GitHub actions"
 }
 
+variable "build_sa_id" {
+  type        = string
+  description = "Fully-qualified ID of the service account used by Cloud Build when building the function"
+}
+
 variable "environment_variables" {
   type        = map(any)
   description = "Environment variables available to the function"

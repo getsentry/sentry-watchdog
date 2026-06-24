@@ -1,3 +1,1 @@
-export declare function instrumentBtoa({ instrumentFunctionViaProxy }: {
-    instrumentFunctionViaProxy: any;
-}): void;
+export declare function instrumentBtoa({ instrumentFunctionViaProxy }: { instrumentFunctionViaProxy: any }): void;

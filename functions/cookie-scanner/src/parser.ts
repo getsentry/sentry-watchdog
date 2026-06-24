@@ -1,30 +1,9 @@
 import { getDomain } from 'tldts';
 import { getCanvasFontFingerprinters, getCanvasFingerprinters } from './canvas-fingerprinting';
 import { loadBrowserCookies, matchCookiesToEvents } from './inspectors/cookies';
-import { 
-    BEHAVIOUR_TRACKING_EVENTS, 
-    FINGERPRINTABLE_WINDOW_APIS, 
-    FB_ADVANCED_MATCHING_PARAMETERS, 
-    FB_STANDARD_EVENTS,
-    TIKTOK_ADVANCED_MATCHING_PARAMETERS,
-    TIKTOK_STANDARD_EVENTS,
-    TWITTER_ADVANCED_MATCHING_PARAMETERS,
-    TWITTER_STANDARD_EVENTS
-} from './helpers/statics';
-import {
-    BlacklightEvent,
-    JsInstrumentEvent,
-    KeyLoggingEvent,
-    SessionRecordingEvent,
-    TrackingRequestEvent,
-    TikTokContext,
-} from './types';
-import { 
-    getScriptUrl, 
-    groupBy, 
-    loadJSONSafely, 
-    hasOwnProperty, 
-} from './helpers/utils';
+import { BEHAVIOUR_TRACKING_EVENTS, FINGERPRINTABLE_WINDOW_APIS, FB_ADVANCED_MATCHING_PARAMETERS, FB_STANDARD_EVENTS, TIKTOK_ADVANCED_MATCHING_PARAMETERS, TIKTOK_STANDARD_EVENTS, TWITTER_ADVANCED_MATCHING_PARAMETERS, TWITTER_STANDARD_EVENTS } from './helpers/statics';
+import { BlacklightEvent, JsInstrumentEvent, KeyLoggingEvent, SessionRecordingEvent, TrackingRequestEvent, TikTokContext } from './types';
+import { getScriptUrl, groupBy, loadJSONSafely, hasOwnProperty } from './helpers/utils';
 
 export const generateReport = (reportType, messages, dataDir, url) => {
     const eventData = getEventData(reportType, messages);
