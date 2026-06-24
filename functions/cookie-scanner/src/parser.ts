@@ -216,7 +216,10 @@ const reportThirdPartyTrackers = (eventData: BlacklightEvent[], firstPartyDomain
 
 const reportGoogleAnalyticsEvents = (eventData: BlacklightEvent[]) => {
     const googleAnalyticsEvents = eventData.filter((event: TrackingRequestEvent) => {
-        return event.url.includes('stats.g.doubleclick') 
+        // Match both the analytics collect beacons (google-analytics.com/collect and
+        // GA4 /g/collect, incl. region* and www subdomains) and the Google Signals /
+        // Ads endpoint (stats.g.doubleclick.net), as long as they carry a measurement id.
+        return (event.url.includes('google-analytics.com') || event.url.includes('stats.g.doubleclick'))
             && (
                 event.url.includes('UA-') // old version of google ids
                 || event.url.includes('G-') // this and following are new version
@@ -242,10 +245,11 @@ const reportFbPixelEvents = (eventData: BlacklightEvent[]) => {
         (e: TrackingRequestEvent) =>
             e.url.includes('facebook') && e.data.query && Object.keys(e.data.query).includes('ev') && e.data.query.ev !== 'Microdata'
     );
-    const advancedMatchingParams = [];
-    const dataParams = [];
-
     return events.map((e: TrackingRequestEvent) => {
+        // Per-event arrays: declaring these outside the map would alias the same arrays
+        // across every returned entry, accumulating params from all events into each.
+        const advancedMatchingParams = [];
+        const dataParams = [];
         let eventName = '';
         let eventDescription = '';
         let pageUrl = '';
@@ -398,7 +402,7 @@ const reportTwitterPixel = (eventData: BlacklightEvent[]) => {
                             });
                         }
                     })
-                } else {
+                } else if (value && typeof value === 'object') {
                     for (const [eventKey, eventValue] of Object.entries(value)) {
                         if (eventKey === 'content_type') {
                             eventName = eventValue;
@@ -428,6 +432,16 @@ const reportTwitterPixel = (eventData: BlacklightEvent[]) => {
                                 value: eventValue
                             });
                         }
+                    }
+                } else {
+                    // Plain string / primitive event identifier (the query param wasn't
+                    // a JSON array or object): treat it as the event name instead of
+                    // iterating its characters via Object.entries.
+                    eventName = value as string;
+                    const standardEvent = TWITTER_STANDARD_EVENTS.filter(f => f.eventName === value);
+                    if (standardEvent.length > 0) {
+                        isStandardEvent = true;
+                        eventDescription = standardEvent[0].eventDescription;
                     }
                 }
             } else if (key === 'dv') {
