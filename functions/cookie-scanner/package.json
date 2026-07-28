@@ -30,7 +30,7 @@
     "@sentry/google-cloud-serverless": "^10.58.0",
     "@sparticuz/chromium": "^133.0.0",
     "@themarkup/puppeteer-har": "^0.2.0",
-    "axios": "^1.16.0",
+    "axios": "^1.18.1",
     "lodash.flatten": "^4.4.0",
     "lodash.samplesize": "^4.2.0",
     "puppeteer": "^22.15.0",
