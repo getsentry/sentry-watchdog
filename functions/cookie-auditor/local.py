@@ -7,6 +7,8 @@ import logging
 from google.cloud import storage
 from collections import defaultdict
 
+from main import identify_unknown_cookies
+
 
 AGGREGATE_REPORTS_BUCKET = "aggregated-reports-storage"
 
@@ -20,18 +22,6 @@ UNKNOWN_COOKIES_TEMPLATE = {
     "session_recorders": {},
     "third_party_trackers": {},
 }
-
-
-def identify_unknow_cookies(known_cookies, cookie_found):
-    unknown_cookies = {}
-    for category, category_data in cookie_found.items():
-        if category:
-            for key in category_data:
-                if key not in known_cookies[category]:
-                    if category not in unknown_cookies:
-                        unknown_cookies[category] = {}
-                    unknown_cookies[category][key] = category_data[key]
-    return unknown_cookies
 
 
 def combine_reports(bucket_name):
@@ -115,7 +105,7 @@ def main():
         json.dump(scan_result, f)
 
     # # compare found cookies and approved cookies
-    unknown_cookies = identify_unknow_cookies(known_cookies, scan_result)
+    unknown_cookies = identify_unknown_cookies(known_cookies, scan_result)
     print(f"unknown_cookies: {unknown_cookies}")
 
     # save to file

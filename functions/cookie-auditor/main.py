@@ -29,15 +29,33 @@ if SENTRY_DSN:
     )
 
 
-def identify_unknow_cookies(known_cookies, cookie_found):
+# Cloudflare bot management, protection, and rate limiting are permitted on any domain.
+ALLOWED_ANY_DOMAIN_COOKIES = frozenset(
+    {
+        "__cfruid",
+        "_cfuvid",
+        "cf_clearance",
+        "__cf_bm",
+    }
+)
+
+
+def is_allowed_any_domain_cookie(key):
+    cookie_name = key.split("/", 1)[0]
+    return cookie_name in ALLOWED_ANY_DOMAIN_COOKIES
+
+
+def identify_unknown_cookies(known_cookies, cookie_found):
     unknown_cookies = {}
     for category, category_data in cookie_found.items():
         if category:
-            for key in category_data:
+            for key, pages in category_data.items():
+                if category == "cookies" and is_allowed_any_domain_cookie(key):
+                    continue
                 if key not in known_cookies[category]:
                     if category not in unknown_cookies:
                         unknown_cookies[category] = {}
-                    unknown_cookies[category][key] = category_data[key]
+                    unknown_cookies[category][key] = pages
     return unknown_cookies
 
 
@@ -137,7 +155,7 @@ def main(request):
     print(f"scan_result: {scan_result}")
 
     # # compare found cookies and approved cookies
-    unknown_cookies = identify_unknow_cookies(known_cookies, scan_result)
+    unknown_cookies = identify_unknown_cookies(known_cookies, scan_result)
     print(f"unknown_cookies: {unknown_cookies}")
 
     if failed_pages:
