@@ -87,6 +87,10 @@ dist
 !__tests__/test-pages/*
 !__tests__/test-pages/js-instrument/*
 
+# Python
+__pycache__/
+*.pyc
+
 # Scan results
 scan_results
 scan_reports
