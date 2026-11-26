@@ -1,0 +1,36 @@
+# Dependabot configuration.
+#
+# We run security updates only (no scheduled version-update noise), so every
+# ecosystem below sets open-pull-requests-limit: 0, which disables version-update
+# PRs while leaving Dependabot security updates running.
+#
+# puppeteer is pinned to v22 in practice: functions/cookie-scanner depends on
+# @themarkup/puppeteer-har, whose peer dependency is puppeteer@^22. A major
+# puppeteer bump (e.g. 22 -> 25) therefore fails `npm ci` on the peer conflict
+# and breaks the `tsc` build (PuppeteerLaunchOptions was removed in puppeteer
+# v23). We ignore puppeteer major updates until puppeteer-har supports a newer
+# major; puppeteer 22.x patches/minors still flow.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/functions/cookie-scanner"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+    ignore:
+      - dependency-name: "puppeteer"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "@types/puppeteer"
+        update-types: ["version-update:semver-major"]
+
+  - package-ecosystem: "pip"
+    directory: "/functions/cookie-auditor"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "pip"
+    directory: "/functions/sitemap-collector"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
