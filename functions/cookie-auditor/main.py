@@ -36,6 +36,7 @@ ALLOWED_ANY_DOMAIN_COOKIES = frozenset(
         "_cfuvid",
         "cf_clearance",
         "__cf_bm",
+        "__cf_ob",
     }
 )
 
